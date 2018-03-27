@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+-------------------------------------------------
+    Description :  some necessary imports 
+    Email : autuanliu@163.com
+    Date：2018/3/27
+"""
+import copy, time
+from pathlib import PurePath
+from functools import wraps
+
+import matplotlib.pyplot as plt
+import numpy as np, torch, torchvision
+from torch import nn, optim
+from torch.autograd import Variable
+from torch.optim import lr_scheduler
+from torch.utils.data import DataLoader
+from torchvision import transforms, datasets
+
+gpu = torch.cuda.is_available()
+# model string
+def autuanliu(name, paper_title, paper_href, writer, ref):
+    def docs_wrapper(func):
+        localtime = time.asctime(time.localtime(time.time()))
+        func.__doc__ = fr"""{name} model from `"{paper_title}" <{paper_href}>`_ which is implemented by {writer} with PyTorch.
+
+reference:
+    {ref}
+        """
+        print(f'{name} model call at {localtime}.')
+        return func
+    return docs_wrapper
