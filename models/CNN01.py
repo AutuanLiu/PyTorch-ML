@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 -------------------------------------------------
-    File Name：CNN01
     Description :  CNN 的简单实现  
     Email : autuanliu@163.com
     Date：2018/3/24

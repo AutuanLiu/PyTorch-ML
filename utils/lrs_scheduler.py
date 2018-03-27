@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 -------------------------------------------------
-    File Name：lrs_scheduler
-    Description :  学习率调度器 
+    Description :  lrs_scheduler 
     1. https://towardsdatascience.com/transfer-learning-using-pytorch-4c3475f4495
     2. https://discuss.pytorch.org/t/solved-learning-rate-decay/6825/5
     3. https://discuss.pytorch.org/t/adaptive-learning-rate/320/34
