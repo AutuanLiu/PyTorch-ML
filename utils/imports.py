@@ -6,7 +6,7 @@
     Email : autuanliu@163.com
     Date：2018/3/27
 """
-import copy, time
+import copy, time, os
 from pathlib import PurePath
 from functools import wraps
 
@@ -20,7 +20,7 @@ from torchvision import transforms, datasets
 
 gpu = torch.cuda.is_available()
 # model string
-def autuanliu(name, paper_title, paper_href, writer, ref):
+def model_doc(name, paper_title, paper_href, writer, ref):
     def docs_wrapper(func):
         localtime = time.asctime(time.localtime(time.time()))
         func.__doc__ = fr"""{name} model from `"{paper_title}" <{paper_href}>`_ which is implemented by {writer} with PyTorch.
@@ -31,3 +31,7 @@ reference:
         print(f'{name} model call at {localtime}.')
         return func
     return docs_wrapper
+
+# file or folder exist
+def is_file_exist(filename): return os.path.isfile(filename)
+def is_folder_exist(dirname): return os.path.exists(dirname)

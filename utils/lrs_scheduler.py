@@ -6,11 +6,13 @@
     1. https://towardsdatascience.com/transfer-learning-using-pytorch-4c3475f4495
     2. https://discuss.pytorch.org/t/solved-learning-rate-decay/6825/5
     3. https://discuss.pytorch.org/t/adaptive-learning-rate/320/34
+    4. https://github.com/pytorch/pytorch/blob/master/torch/optim/lr_scheduler.py
     Email : autuanliu@163.com
     Date：2018/3/22
 """
-import torch
+import torch, math
 from torch.optim import optimizer
+from torch.optim.lr_scheduler import _LRScheduler, CosineAnnealingLR
 
 
 # Decaying Learning Rate
@@ -66,22 +68,33 @@ def adjust_learning_rate(optimizer, iter, each):
     return lr
 
 
-def set_optimizer_lr(optimizer, lr):
-    # callback to set the learning rate in an optimizer, without rebuilding the whole optimizer
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
-    return optimizer
 
-def sgdr(period, batch_idx):
-    # returns normalised anytime sgdr schedule given period and batch_idx
-    # best performing settings reported in paper are T_0 = 10, T_mult=2
-    # so always use T_mult=2
-    batch_idx = float(batch_idx)
-    restart_period = period
-    while batch_idx/restart_period > 1.:
-        batch_idx = batch_idx - restart_period
-        restart_period = restart_period * 2.
+class CyclicalLR(_LRScheduler):
+    def __init__(self, optimizer, step_size, gamma=0.1, last_epoch=-1):
+        self.step_size = step_size
+        self.gamma = gamma
+        super(StepLR, self).__init__(optimizer, last_epoch)
 
-    radians = math.pi*(batch_idx/restart_period)
-    return 0.5*(1.0 + math.cos(radians))
-    
+    def get_lr(self):
+        return [base_lr * self.gamma ** (self.last_epoch // self.step_size)
+                for base_lr in self.base_lrs]
+
+
+
+
+class WarmRestart(CosineAnnealingLR):
+    def __init__(self, optimizer, T_max=10, T_mult=1, eta_min=0, last_epoch=-1):
+        self.T_mult = T_mult
+        self.T_cur, self.cycle_cnt = -1, 0
+        super().__init__(optimizer, T_max, eta_min, last_epoch)
+
+    def get_lr(self):
+        if self.T_cur == self.T_max:
+            self.T_cur = 0
+            self.cycle_cnt += 1
+            self.T_max *= self.T_mult ** self.circle_cnt
+        self.T_cur = 0 if self.T_cur < 0
+        new_lrs = [self.eta_min + (base_lr - self.eta_min) * (1 + math.cos(math.pi * self.T_cur / self.T_max)) / 2 
+        for base_lr in self.base_lrs]
+        self.T_cur += 1
+        return new_lrs

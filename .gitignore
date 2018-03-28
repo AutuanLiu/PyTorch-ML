@@ -9,9 +9,6 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
-.vscode/
-.datasets/
-.logs/
 build/
 develop-eggs/
 dist/
@@ -102,3 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# ignore folders
+.vscode/
+.datasets/
+.logs/
