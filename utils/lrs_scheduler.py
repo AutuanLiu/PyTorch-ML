@@ -95,3 +95,58 @@ class WarmRestart(CosineAnnealingLR):
         for base_lr in self.base_lrs]
         self.T_cur += 1
         return new_lrs
+
+def clr(opt, cur_iter, cur_epoch, step_sz, max_lr=5, gamma=1., scale_fn=None, mode='triangular', scale_mode='cycle'):
+    """Cyclical learning rate policy (CLR).
+    
+    This policy is defined on iterations(minibatch).
+    Parameters:
+    ----------
+    step_sz: int
+        (2~10) * (len(data)/minibatch)
+    """
+    if not isinstance(opt, Optimizer):
+        raise TypeError(f'{type(opt).__name__} is not an Optimizer')
+    for group in opt.param_groups:
+        group.setdefault('initial_lr', group['lr'])
+    base_lrs = list(map(lambda group: group['initial_lr'], opt.param_groups))
+    if scale_fn == None:
+        if mode == 'triangular':
+            scale_fn = lambda x: 1.
+            scale_mode = 'cycle'
+        elif mode == 'triangular2':
+            scale_fn = lambda x: 1/(2.**(x-1))
+            scale_mode = 'cycle'
+        elif mode == 'exp_range':
+            scale_fn = lambda x: gamma**(x)
+            scale_mode = 'iterations'
+    else:
+        scale_fn = scale_fn
+        scale_mode = scale_mode
+    if cur_epoch < 2*step_sz:
+        cycle = np.floor(1 + cur_iter / (2*step_sz)
+        x = np.abs(cur_iter / step_sz - 2*cycle + 1)
+        if scale_mode == 'cycle':
+            new_lrs = [base_lr + (max_lr - base_lr) * np.maximum(0, (1-x)) * scale_fn(cycle) for base_lr in base_lrs]
+        else:
+            new_lrs = [base_lr + (max_lr - base_lr) * np.maximum(0, (1-x)) * scale_fn(cur_iter) for base_lr in base_lrs]
+        for param_group, lr in zip(opt.param_groups, new_lrs):
+            param_group['lr'] = lr
+        cur_iter += 1 
+    else:
+        cur_iter = 0
+        for group in opt.param_groups:
+            group['lr'] = group['initial_lr']   
+    return opt
+
+
+def lr_finder(opt, cur_iter, step_sz, max_lr=5):
+    if not isinstance(opt, Optimizer):
+        raise TypeError(f'{type(opt).__name__} is not an Optimizer')
+    for group in opt.param_groups:
+        group.setdefault('initial_lr', group['lr'])
+    base_lrs = list(map(lambda group: group['initial_lr'], opt.param_groups))
+    cycle = np.floor(1 + cur_iter / (2*step_sz)
+    x = np.abs(cur_iter / step_sz - 2*cycle + 1)
+    new_lrs = [base_lr + (max_lr - base_lr) * np.maximum(0, (1-x)) for base_lr in base_lrs]
+    return new_lrs
