@@ -13,6 +13,7 @@ from functools import wraps
 import matplotlib.pyplot as plt
 import numpy as np, torch, torchvision
 from torch import nn, optim
+import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader

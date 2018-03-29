@@ -55,8 +55,8 @@ class CyclicalLR(_LRScheduler):
  
     def get_lr(self):
         cycle = np.floor(1 + self.last_epoch / (2*self.step_size)
-        x = np.abs(self.last_epoch / self.step_size - 2*cycle + 1)
-        return [base_lr + (self.max_lr - base_lr) * np.maximum(0, (1-x)) * self.scale_fn(cycle) for base_lr in self.base_lrs]
+        tmp = 1 - np.abs(self.last_epoch / self.step_size - 2*cycle + 1)
+        return [base_lr + (self.max_lr - base_lr) * np.maximum(0, tmp) * self.scale_fn(cycle) for base_lr in self.base_lrs]
 
 
 class WarmRestart(CosineAnnealingLR):
