@@ -6,7 +6,8 @@
    Email : autuanliu@163.com
    Date：2018/3/27
 """
-# from utils.lrs_scheduler import WarmRestart, CyclicalLR,  lr_finder, clr
+from utils.lrs_scheduler import WarmRestart, CyclicalLR,  lr_finder, clr
+from utils.lrs_scheduler import WarmRestart
 from utils.imports import *
 from sklearn.datasets import load_iris
 
