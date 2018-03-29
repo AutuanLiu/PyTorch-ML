@@ -102,5 +102,5 @@ ENV/
 
 # ignore folders
 .vscode/
-.datasets/
-.logs/
+datasets/
+logs/
