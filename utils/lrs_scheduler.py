@@ -13,9 +13,8 @@
     Email : autuanliu@163.com
     Date：2018/3/22
 """
-import torch, math, numpy as np
-from torch.optim import optimizer
-from torch.optim.lr_scheduler import _LRScheduler, CosineAnnealingLR
+from .utils_imports import *
+from torch.optim.lr_scheduler import CosineAnnealingLR
 
 
 class WarmRestart(CosineAnnealingLR):
@@ -24,7 +23,7 @@ class WarmRestart(CosineAnnealingLR):
     Set the learning rate of each parameter group using a cosine annealing schedule, When last_epoch=-1, sets initial lr as lr.
     """
 
-    def __init__(self, optimizer, T_max=10, T_mult=1, eta_min=0, last_epoch=-1):
+    def __init__(self, optimizer, T_max=10, T_mult=2, eta_min=0, last_epoch=-1):
         """implements SGDR
         
         Parameters:
@@ -41,17 +40,14 @@ class WarmRestart(CosineAnnealingLR):
         self.T_mult = T_mult
         super().__init__(optimizer, T_max, eta_min, last_epoch)
 
-    def restart(self):
+    def get_lr(self):
         if self.last_epoch == self.T_max:
             self.last_epoch = -1
             self.T_max *= self.T_mult
-
-    def get_lr(self):
-        self.restart()
         return [self.eta_min + (base_lr - self.eta_min) * (1 + math.cos(math.pi * self.last_epoch / self.T_max)) / 2 for base_lr in self.base_lrs]
 
 
-def cyclical_lr(step_sz, min_lr=0.001, max_lr=2, mode='triangular', scale_func=None, scale_md='cycles', gamma=1.):
+def cyclical_lr(step_sz, min_lr=0.001, max_lr=1, mode='triangular', scale_func=None, scale_md='cycles', gamma=1.):
     """implements a cyclical learning rate policy (CLR).
     
     The method cycles the learning rate between two boundaries with some constant frequency, as detailed in this 
@@ -67,6 +63,11 @@ def cyclical_lr(step_sz, min_lr=0.001, max_lr=2, mode='triangular', scale_func=N
     Note the learning rate value when the accuracy starts to increase and when the accuracy slows, becomes ragged, or starts to fall. These two learning rates 
     are good choices for bounds; that is, set base lr to the first value and set max lr to the latter value. Alternatively, one can use the rule of
     thumb that the optimum learning rate is usually within a factor of two of the largest one that converges and set base lr to 1/3 or 1/4 of max lr
+    5. The optimum learning rate will be between the bounds and near optimal learning rates will be used throughout training.
+    6. find_lr: loss vs lr or acc vs lr
+    
+    Notes: the learning rate of optimizer should be 1
+
     Parameters:
     ----------
     min_lr : float
@@ -87,6 +88,14 @@ def cyclical_lr(step_sz, min_lr=0.001, max_lr=2, mode='triangular', scale_func=N
             iterations since start of cycle). Default is 'cycles'.
     gamma : float, optional
         constant in 'exp_range' scaling function: gamma**(cycle iterations)
+    
+    Returns:
+    --------
+        lambda function
+    
+    Examples:
+    --------
+    >>> 
     """
     if scale_func == None:
         if mode == 'triangular':
@@ -104,7 +113,7 @@ def cyclical_lr(step_sz, min_lr=0.001, max_lr=2, mode='triangular', scale_func=N
         scale_fn = scale_func
         scale_mode = scale_md
 
-    lr_lambda = lambda iteration: min_lr + (max_lr - min_lr) * rel_val(iteration, step_sz, scale_mode)
+    lr_lambda = lambda iters: min_lr + (max_lr - min_lr) * rel_val(iters, step_sz, scale_mode)
 
     def rel_val(iteration, stepsize, mode):
         cycle = math.floor(1 + iteration / (2 * stepsize))

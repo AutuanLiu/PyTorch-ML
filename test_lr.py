@@ -6,8 +6,9 @@
     Email : autuanliu@163.com
     Date：2018/3/29
 """
-from utils.imports import *
-from utils.lrs_scheduler import cyclical_lr, clr_reset, warm_restart, WarmRestart
+from utils.utils_imports import *
+from vislib.line_plot import line
+from utils.lrs_scheduler import *
 
 
 def get_data(flag=True):
@@ -53,7 +54,8 @@ def train_m(mod, data_loader, scheduler):
         optimizer.step()
 
         # learning sampler and visualize
-        vis_d.append(scheduler.get_lr()[0])
+        vis_lr.append(scheduler.get_lr())
+        vis_loss.append(loss.data[0])
 
         if batch_idx % 10 == 0:
             len1 = batch_idx * len(data)
@@ -80,41 +82,58 @@ def test_m(mod, data_loader):
 
 
 # some config
-config = {'batch_size': 64, 'epoch_num': 5, 'lr': 0.001, 'in_feature': 28 * 28, 'out_feature': 10}
+config = {'batch_size': 64, 'epoch_num': 2, 'lr': 0.001, 'in_feature': 28 * 28, 'out_feature': 10}
 train_loader, test_loader = get_data(), get_data(flag=False)
 
 # model, criterion, optimizer
 model = Network(config)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=config['lr'], momentum=0.9)
+optimizer = optim.Adam(model.parameters(), lr=config['lr'])
 
 # learning rate scheduler
 ########################### CLR policy test start ####################################
 # step_sz is 2~10 * len(train_loader)
-# step_size = 4*len(train_loader)
+# step_size = 2*len(train_loader)
+
 # test different policy
-# clr = cyclical_lr(step_size, min_lr=config['lr'], max_lr=1)
-# clr = cyclical_lr(step_size, min_lr=config['lr'], max_lr=1, mode='triangular2')
-# clr = cyclical_lr(step_size, min_lr=config['lr'], max_lr=1, mode='exp_range', gamma=0.99994)
+# clr = cyclical_lr(step_size, 0.001, 0.005)
+# clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, mode='triangular2')
+# clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, mode='exp_range', gamma=0.99994)
+
 # custom cycle policy
 # clr_func = lambda x: 0.5 * (1 + np.sin(np.pi / 2. * x))
-# clr = cyclical_lr(step_size, min_lr=config['lr'], max_lr=1, scale_func=clr_func, scale_md='cycles')
+# clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, scale_func=clr_func, scale_md='cycles')
+
 # custom iteration policy
 # clr_func = lambda x: 1 / (5 ** (x * 0.0001))
-# clr = cyclical_lr(step_size, min_lr=config['lr'], max_lr=1, scale_func=clr_func, scale_md='iterations')
+# clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, scale_func=clr_func, scale_md='iterations')
+# scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
+
+# find lr setting
+# step_size = 2*len(train_loader)
+# clr = cyclical_lr(step_size, min_lr=0.00001, max_lr=0.0005)
+# lambda2 = lambda epoch: 0.95 ** epoch
 # scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
 ########################### CLR policy test end #######################################
 ########################### SGDR policy test start ####################################
-# scheduler = lr_scheduler.CosineAnnealingLR(optimizer, 100, eta_min=float(1e-8))
-scheduler = WarmRestart(optimizer, T_max=1000, T_mult=2, eta_min=float(1e-8))
+# CosineAnnealingLR with warm_restart
+# scheduler = CosineAnnealingLR(optimizer, 100, eta_min=0)
+# or WarmRestart
+scheduler = WarmRestart(optimizer, T_max=1000, T_mult=2, eta_min=0)
 ########################### SGDR policy test end ######################################
 # train, test
-vis_d = []
+vis_lr, vis_loss = [], []
 # if
 for epoch in range(config['epoch_num']):
     train_m(model, train_loader, scheduler)
 test_m(model, test_loader)
 
 # lr visualize
-plt.plot(vis_d)
+line(vis_lr)
+
+# for lr finder
+# _, ax = plt.subplots()
+# ax.plot(vis_lr, vis_loss)
+# ax.set_xscale('log')
+
 plt.show()

@@ -17,6 +17,7 @@ class DataDef(Dataset):
     
     Request input is csv file read by pandas.read_csv
     """
+
     def __init__(self, load_dir, row_idx, x_idx, y_idx, sep=',', dtype=np.float32, **kwargs):
         """
         Parameters:
