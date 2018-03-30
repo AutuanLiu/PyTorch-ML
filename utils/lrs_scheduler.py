@@ -57,6 +57,16 @@ def cyclical_lr(step_sz, min_lr=0.001, max_lr=2, mode='triangular', scale_func=N
     The method cycles the learning rate between two boundaries with some constant frequency, as detailed in this 
     paper (https://arxiv.org/abs/1506.01186). The amplitude of the cycle can be scaled on a per-iteration or per-cycle basis.
     This function has three built-in policies, as put forth in the paper.
+
+    1. The difficulty in minimizing the loss arise from saddle rather than poor local minima(Dauphin, 2015).
+    2. Set stepsize equal to 2~10 times he number of iterations in an epoch.
+    3. It's best to stop training at the end of a cycle which is when the learning rate is at the minimum value and the accuracy peaks.(back to min learning rate at the training end)
+    4. LR range test: The triangular learning rate policy provides a simple mechanism to do this. Set base lr to the minimum value and set max lr to the 
+    maximum value. Set both the stepsize and max iter to the same number of iterations. In this case, the learning rate will increase linearly from the minimum 
+    value to the maximum value during this short run. Next, plot the accuracy versus learning rate. 
+    Note the learning rate value when the accuracy starts to increase and when the accuracy slows, becomes ragged, or starts to fall. These two learning rates 
+    are good choices for bounds; that is, set base lr to the first value and set max lr to the latter value. Alternatively, one can use the rule of
+    thumb that the optimum learning rate is usually within a factor of two of the largest one that converges and set base lr to 1/3 or 1/4 of max lr
     Parameters:
     ----------
     min_lr : float

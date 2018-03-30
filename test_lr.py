@@ -11,7 +11,7 @@ from utils.lrs_scheduler import cyclical_lr, clr_reset, warm_restart, WarmRestar
 
 
 def get_data(flag=True):
-    mnist = datasets.MNIST('datasets/mnist/', train=flag, transform=transforms.ToTensor(), download=flag)
+    mnist = datasets.FashionMNIST('datasets/fashionmnist/', train=flag, transform=transforms.ToTensor(), download=flag)
     loader = DataLoader(mnist, batch_size=config['batch_size'], shuffle=flag, drop_last=False)
     return loader
 
@@ -90,7 +90,8 @@ optimizer = optim.SGD(model.parameters(), lr=config['lr'], momentum=0.9)
 
 # learning rate scheduler
 ########################### CLR policy test start ####################################
-# step_size = len(train_loader)
+# step_sz is 2~10 * len(train_loader)
+# step_size = 4*len(train_loader)
 # test different policy
 # clr = cyclical_lr(step_size, min_lr=config['lr'], max_lr=1)
 # clr = cyclical_lr(step_size, min_lr=config['lr'], max_lr=1, mode='triangular2')
@@ -109,6 +110,7 @@ scheduler = WarmRestart(optimizer, T_max=1000, T_mult=2, eta_min=float(1e-8))
 ########################### SGDR policy test end ######################################
 # train, test
 vis_d = []
+# if
 for epoch in range(config['epoch_num']):
     train_m(model, train_loader, scheduler)
 test_m(model, test_loader)
