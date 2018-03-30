@@ -64,7 +64,6 @@ def cyclical_lr(step_sz, min_lr=0.001, max_lr=1, mode='triangular', scale_func=N
     are good choices for bounds; that is, set base lr to the first value and set max lr to the latter value. Alternatively, one can use the rule of
     thumb that the optimum learning rate is usually within a factor of two of the largest one that converges and set base lr to 1/3 or 1/4 of max lr
     5. The optimum learning rate will be between the bounds and near optimal learning rates will be used throughout training.
-    6. find_lr: loss vs lr or acc vs lr
     
     Notes: the learning rate of optimizer should be 1
 
@@ -95,7 +94,13 @@ def cyclical_lr(step_sz, min_lr=0.001, max_lr=1, mode='triangular', scale_func=N
     
     Examples:
     --------
-    >>> 
+    >>> optimizer = optim.Adam(model.parameters(), lr=1.)
+    >>> step_size = 2*len(train_loader)
+    >>> clr = cyclical_lr(step_size, min_lr=0.001, max_lr=0.005)
+    >>> scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
+    >>> # some other operations
+    >>> scheduler.step()
+    >>> optimizer.step()
     """
     if scale_func == None:
         if mode == 'triangular':
@@ -137,6 +142,12 @@ def clr_reset(scheduler, thr):
         instance of optim.lr_scheduler
     thr : int
         the reset point
+    
+    Examples:
+    --------
+    >>> # some other operations(note the order of operations)
+    >>> scheduler = clr_reset(scheduler, 1000)
+    >>> scheduler.step()
     """
     if scheduler.last_epoch + 1 == thr:
         scheduler.last_epoch = -1
@@ -150,6 +161,12 @@ def warm_restart(scheduler, T_mult=2):
     ----------
     T_mult: int
         default is 2, Stochastic Gradient Descent with Warm Restarts(SGDR): https://arxiv.org/abs/1608.03983.
+
+    Examples:
+    --------
+    >>> # some other operations(note the order of operations)
+    >>> scheduler = warm_restart(scheduler, T_mult=2)
+    >>> scheduler.step()
     """
     if scheduler.last_epoch + 1 == scheduler.T_max:
         scheduler.last_epoch = -1
