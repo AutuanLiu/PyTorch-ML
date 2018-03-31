@@ -8,8 +8,9 @@
 """
 import copy, time, os, math
 from pathlib import PurePath
-from functools import wraps
+from functools import wraps, reduce
 
+import Augmentor
 import matplotlib.pyplot as plt
 import numpy as np, torch, torchvision
 from torch import nn, optim
