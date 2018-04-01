@@ -54,8 +54,8 @@ def train_m(mod, data_loader, scheduler):
         optimizer.step()
 
         # learning sampler and visualize
-        # vis_lr.append(scheduler.get_lr())
-        # vis_loss.append(loss.data[0])
+        vis_lr.append(scheduler.get_lr())
+        vis_loss.append(loss.data[0])
         # print([x for x in scheduler.get_lr()])
 
         if batch_idx % 10 == 0:
@@ -83,7 +83,7 @@ def test_m(mod, data_loader):
 
 
 # some config
-config = {'batch_size': 64, 'epoch_num': 10, 'lr': 0.001, 'in_feature': 28 * 28, 'out_feature': 10}
+config = {'batch_size': 64, 'epoch_num': 500, 'lr': 0.001, 'in_feature': 28 * 28, 'out_feature': 10}
 train_loader, test_loader = get_data(), get_data(flag=False)
 
 # model, criterion, optimizer
