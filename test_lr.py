@@ -83,7 +83,7 @@ def test_m(mod, data_loader):
 
 
 # some config
-config = {'batch_size': 64, 'epoch_num': 500, 'lr': 0.001, 'in_feature': 28 * 28, 'out_feature': 10}
+config = {'batch_size': 64, 'epoch_num': 400, 'lr': 0.001, 'in_feature': 28 * 28, 'out_feature': 10}
 train_loader, test_loader = get_data(), get_data(flag=False)
 
 # model, criterion, optimizer
@@ -120,12 +120,13 @@ optimizer = optim.Adam(model.parameters(), lr=config['lr'])
 # CosineAnnealingLR with warm_restart
 # scheduler = CosineAnnealingLR(optimizer, 100, eta_min=0)
 # or WarmRestart
-scheduler = WarmRestart(optimizer, T_max=2, T_mult=2, eta_min=1e-10)
+scheduler = WarmRestart(optimizer, T_max=1000, T_mult=2, eta_min=1e-10)
 ########################### SGDR policy test end ######################################
 # train, test
 vis_lr, vis_loss = [], []
 # if
 for epoch in range(config['epoch_num']):
+    # scheduler = warm_restart(scheduler, T_mult=2)
     # scheduler.step()
     # print([x for x in scheduler.get_lr()])
     train_m(model, train_loader, scheduler)
