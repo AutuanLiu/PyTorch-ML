@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 -------------------------------------------------
-    Description :  utils.lr_scheduler module test
+    Description :  utils.lrs_scheduler module test
     Email : autuanliu@163.com
     Date：2018/3/29
 """
@@ -47,22 +47,25 @@ def train_m(mod, data_loader, scheduler):
         loss.backward()
 
         # for CLR policy test
+        # scheduler.step()
         # scheduler = clr_reset(scheduler, 1000)
         # for warm_restart test
+        # scheduler.step()
         # scheduler = warm_restart(scheduler, T_mult=2)
-        scheduler.step()
+
+        # scheduler.step()
         optimizer.step()
 
         # learning sampler and visualize
-        vis_lr.append(scheduler.get_lr())
-        vis_loss.append(loss.data[0])
+        # vis_lr.append(scheduler.get_lr())
+        # vis_loss.append(loss.data[0])
         # print([x for x in scheduler.get_lr()])
 
         if batch_idx % 10 == 0:
             len1 = batch_idx * len(data)
             len2 = len(data_loader.dataset)
             pec = 100. * batch_idx / len(data_loader)
-            print(f"Train Epoch: {epoch + 1} [{len1:5d}/{len2:5d} ({pec:3.2f}%)] \t Loss: {loss.data[0]:.5f}")
+            # print(f"Train Epoch: {epoch + 1} [{len1:5d}/{len2:5d} ({pec:3.2f}%)] \t Loss: {loss.data[0]:.5f}")
 
 
 def test_m(mod, data_loader):
@@ -79,11 +82,11 @@ def test_m(mod, data_loader):
 
     test_loss /= len(data_loader.dataset)
     len1 = len(data_loader.dataset)
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(test_loss, correct, len1, 100. * correct / len1))
+    # print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(test_loss, correct, len1, 100. * correct / len1))
 
 
 # some config
-config = {'batch_size': 64, 'epoch_num': 400, 'lr': 0.001, 'in_feature': 28 * 28, 'out_feature': 10}
+config = {'batch_size': 64, 'epoch_num': 10, 'lr': 0.05, 'in_feature': 28 * 28, 'out_feature': 10}
 train_loader, test_loader = get_data(), get_data(flag=False)
 
 # model, criterion, optimizer
@@ -120,15 +123,16 @@ optimizer = optim.Adam(model.parameters(), lr=config['lr'])
 # CosineAnnealingLR with warm_restart
 # scheduler = CosineAnnealingLR(optimizer, 100, eta_min=0)
 # or WarmRestart
-scheduler = WarmRestart(optimizer, T_max=1000, T_mult=2, eta_min=1e-10)
+scheduler = WarmRestart(optimizer, T_max=2, T_mult=2, eta_min=1e-10)
 ########################### SGDR policy test end ######################################
 # train, test
 vis_lr, vis_loss = [], []
 # if
 for epoch in range(config['epoch_num']):
     # scheduler = warm_restart(scheduler, T_mult=2)
-    # scheduler.step()
-    # print([x for x in scheduler.get_lr()])
+    scheduler.step()
+    print(scheduler.get_lr())
+    vis_lr.append(scheduler.get_lr())
     train_m(model, train_loader, scheduler)
 test_m(model, test_loader)
 
