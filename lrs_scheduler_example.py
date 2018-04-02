@@ -17,7 +17,7 @@ def get_data(flag=True):
     return loader
 
 
-# 网络模型定义
+# define network
 class Network(nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -45,27 +45,18 @@ def train_m(mod, data_loader, scheduler):
         output = mod.forward(data)
         loss = criterion.forward(output, target)
         loss.backward()
-
-        # for CLR policy test
-        # scheduler.step()
-        # scheduler = clr_reset(scheduler, 1000)
-        # for warm_restart test
-        # scheduler.step()
-        # scheduler = warm_restart(scheduler, T_mult=2)
-
-        # scheduler.step()
+        scheduler.step()
         optimizer.step()
 
         # learning sampler and visualize
-        # vis_lr.append(scheduler.get_lr())
-        # vis_loss.append(loss.data[0])
-        # print([x for x in scheduler.get_lr()])
+        vis_lr.append(scheduler.get_lr())
+        vis_loss.append(loss.data[0])
 
         if batch_idx % 10 == 0:
             len1 = batch_idx * len(data)
             len2 = len(data_loader.dataset)
             pec = 100. * batch_idx / len(data_loader)
-            # print(f"Train Epoch: {epoch + 1} [{len1:5d}/{len2:5d} ({pec:3.2f}%)] \t Loss: {loss.data[0]:.5f}")
+            print(f"Train Epoch: {epoch + 1} [{len1:5d}/{len2:5d} ({pec:3.2f}%)] \t Loss: {loss.data[0]:.5f}")
 
 
 def test_m(mod, data_loader):
@@ -82,7 +73,7 @@ def test_m(mod, data_loader):
 
     test_loss /= len(data_loader.dataset)
     len1 = len(data_loader.dataset)
-    # print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(test_loss, correct, len1, 100. * correct / len1))
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(test_loss, correct, len1, 100. * correct / len1))
 
 
 # some config
@@ -94,54 +85,16 @@ model = Network(config)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=config['lr'])
 
-# learning rate scheduler
-########################### CLR policy test start ####################################
-# step_sz is 2~10 * len(train_loader)
-# step_size = 2*len(train_loader)
-
-# test different policy
-# clr = cyclical_lr(step_size, 0.001, 0.005)
-# clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, mode='triangular2')
-# clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, mode='exp_range', gamma=0.99994)
-
-# custom cycle policy
-# clr_func = lambda x: 0.5 * (1 + np.sin(np.pi / 2. * x))
-# clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, scale_func=clr_func, scale_md='cycles')
-
-# custom iteration policy
-# clr_func = lambda x: 1 / (5 ** (x * 0.0001))
-# clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, scale_func=clr_func, scale_md='iterations')
-# scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
-
-# find lr setting
-# step_size = 2*len(train_loader)
-# clr = cyclical_lr(step_size, min_lr=0.00001, max_lr=0.0005)
-# lambda2 = lambda epoch: 0.95 ** epoch
-# scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
-########################### CLR policy test end #######################################
-########################### SGDR policy test start ####################################
-# CosineAnnealingLR with warm_restart
-# scheduler = CosineAnnealingLR(optimizer, 100, eta_min=0)
-# or WarmRestart
+# learning rate scheduler, WarmRestart
 scheduler = WarmRestart(optimizer, T_max=2, T_mult=2, eta_min=1e-10)
-########################### SGDR policy test end ######################################
+
 # train, test
 vis_lr, vis_loss = [], []
-# if
+
 for epoch in range(config['epoch_num']):
-    # scheduler = warm_restart(scheduler, T_mult=2)
-    scheduler.step()
-    print(scheduler.get_lr())
-    vis_lr.append(scheduler.get_lr())
     train_m(model, train_loader, scheduler)
 test_m(model, test_loader)
 
 # lr visualize
 line(vis_lr)
-
-# for lr finder
-# _, ax = plt.subplots()
-# ax.plot(vis_lr, vis_loss)
-# ax.set_xscale('log')
-
 plt.show()
