@@ -8,9 +8,10 @@
 """
 from utils.utils_imports import *
 
+
 class SparseAutoencoder(nn.Module):
     def __init(self):
         super().__init__()
-    
+
     def forward(self, x):
         pass

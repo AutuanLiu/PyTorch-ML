@@ -8,6 +8,7 @@
 """
 from .utils_imports import *
 
+
 class NetBase:
     """A abstract class for establish network.
 
@@ -25,9 +26,9 @@ class NetBase:
     @property
     def config():
         return self.config
-    
+
     def train_m(self):
         raise NotImplementedError
-    
+
     def test_m(self):
         raise NotImplementedError
