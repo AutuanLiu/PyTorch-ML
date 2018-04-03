@@ -21,6 +21,7 @@ class WarmRestart(CosineAnnealingLR):
     """This class implements Stochastic Gradient Descent with Warm Restarts(SGDR): https://arxiv.org/abs/1608.03983.
     
     Set the learning rate of each parameter group using a cosine annealing schedule, When last_epoch=-1, sets initial lr as lr.
+    This can't support scheduler.step(epoch). please keep epoch=None.
     """
 
     def __init__(self, optimizer, T_max=10, T_mult=2, eta_min=0, last_epoch=-1):
@@ -54,6 +55,8 @@ def cyclical_lr(step_sz, min_lr=0.001, max_lr=1, mode='triangular', scale_func=N
     paper (https://arxiv.org/abs/1506.01186). The amplitude of the cycle can be scaled on a per-iteration or per-cycle basis.
     This function has three built-in policies, as put forth in the paper.
 
+    Note:
+    -----
     1. The difficulty in minimizing the loss arise from saddle rather than poor local minima(Dauphin, 2015).
     2. Set stepsize equal to 2~10 times he number of iterations in an epoch.
     3. It's best to stop training at the end of a cycle which is when the learning rate is at the minimum value and the accuracy peaks.(back to min learning rate at the training end)

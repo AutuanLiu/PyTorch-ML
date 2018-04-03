@@ -6,9 +6,9 @@
     Email : autuanliu@163.com
     Date：2018/3/29
 """
-from utils.utils_imports import *
-from vislib.line_plot import line
-from utils.lrs_scheduler import *
+from models.utils.utils_imports import *
+from models.vislib.line_plot import line
+from models.utils.lrs_scheduler import *
 
 
 def get_data(flag=True):

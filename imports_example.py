@@ -6,7 +6,7 @@
    Email : autuanliu@163.com
    Date：2018/3/27
 """
-from utils.utils_imports import *
+from models.utils.utils_imports import *
 from sklearn.datasets import load_iris
 
 data, target = load_iris(return_X_y=True)

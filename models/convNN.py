@@ -2,16 +2,15 @@
 # -*- coding: utf-8 -*-
 """
 -------------------------------------------------
-    Description :  CNN 的简单实现  
+    Description :  A class or function set for simple CNN
     Email : autuanliu@163.com
-    Date：2018/3/24
+    Date：2018/3/29
 """
-import torch
-import torch.nn as nn
-use_gpu = torch.cuda.is_available()    # GPU
+from utils.utils_imports import *
+print(gpu)
 
 
-class SimpleCNN(nn.modules):
+class SimpleCNN(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.l1 = nn.Linear(in_features, out_features, bias=True)
@@ -22,4 +21,4 @@ class SimpleCNN(nn.modules):
 
 
 def simpleCNN():
-    return SimpleCNN().cuda() if use_gpu else SimpleCNN()
+    pass
