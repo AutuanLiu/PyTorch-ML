@@ -18,38 +18,48 @@ class Cos(lr_scheduler._LRScheduler):
         self.Ti = T_max
         self.eta_min = eta_min
         self.T_mult = T_mult
+        self.cycle = 0
         super().__init__(optimizer, last_epoch)
 
     def step(self, epoch=None):
         if epoch is None:
             epoch = self.last_epoch + 1
+            if epoch == self.Ti:
+                epoch = 0
+                self.cycle += 1
         else:
-            cycle = int(math.log(self.Ti / self.T_max, self.T_mult))
-            epoch -= sum([self.T_max**(x + 1) for x in range(cycle)])
+            self.cycle = int(math.floor(math.log(epoch / self.T_max * (self.T_mult - 1) + 1, self.T_mult)))
+            epoch -= sum([self.T_max * self.T_mult ** x for x in range(self.cycle)])
         self.last_epoch = epoch
+        self.Ti = self.T_max * self.T_mult ** self.cycle
         for param_group, lr in zip(self.optimizer.param_groups, self.get_lr()):
             param_group['lr'] = lr
 
     def get_lr(self):
-        if self.last_epoch == self.Ti:
-            self.last_epoch = 0
-            self.Ti *= self.T_mult
         return [self.eta_min + (base_lr - self.eta_min) * (1 + math.cos(math.pi * self.last_epoch / self.Ti)) / 2 for base_lr in self.base_lrs]
 
 
 net = Net()
 opt = optim.SGD([{'params': net.conv1.parameters()}, {'params': net.conv2.parameters(), 'lr': 0.5}], lr=0.05)
 
-scheduler = Cos(opt, T_max=5, eta_min=1e-10, T_mult=3)
 
-epochs = 50
+epochs = 10
 eta_min = 1e-10
 T_mult = 3
-T_max = 5
+T_max = 1
 T_cur = list(range(T_max)) + list(range(T_max * T_mult)) + list(range(T_max * T_mult * T_mult))
 T_i = [T_max] * T_max + [T_max * T_mult] * T_max * T_mult + [T_max * T_mult * T_mult] * T_max * T_mult * T_mult
 single_targets = [eta_min + (0.05 - eta_min) * (1 + math.cos(math.pi * x / y)) / 2 for x, y in zip(T_cur, T_i)]
 targets = [single_targets, list(map(lambda x: x * 10, single_targets))]
+scheduler = Cos(opt, T_max=T_max, eta_min=1e-10, T_mult=T_mult)
+
+# without epoch args
+# epochs = 10
+# eta_min = 1e-10
+# single_targets = [eta_min + (0.05 - eta_min) * (1 + math.cos(math.pi * x / epochs)) / 2
+#                   for x in range(epochs)]
+# targets = [single_targets, list(map(lambda x: x * 10, single_targets))]
+# scheduler = Cos(opt, T_max=epochs, eta_min=eta_min)
 
 # print(targets, '\n\n')
 
@@ -69,10 +79,9 @@ targets = [single_targets, list(map(lambda x: x * 10, single_targets))]
 
 def test(scheduler, targets, epochs=10):
     for epoch in range(epochs):
-        # print('pre: ', scheduler.last_epoch, scheduler.Ti, '\n')
-        scheduler.step()
-        # print('epoch: ', epoch, '\n')
-        # print('post: ', scheduler.last_epoch, scheduler.Ti, '\n')
+        scheduler.step(epoch)
+        print('epoch: ', epoch, '\n')
+        print('post: ', scheduler.last_epoch, scheduler.Ti, '\n')
         for param_group, target in zip(opt.param_groups, targets):
             print("target: ", target[epoch], '\n')
             print('ac lr: ', param_group['lr'], '\n')
