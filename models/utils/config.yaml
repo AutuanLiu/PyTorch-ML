@@ -1,0 +1,22 @@
+---
+# the configs of model  
+model:
+  ~
+opt:
+  ~
+criterion:
+  ~
+train_ldr:
+  ~
+val_ldr:
+  ~
+test_ldr:
+  ~
+base_lr:
+  ~
+lrs_decay:
+  ~
+wts_decay:
+  ~
+prt_freq:
+  5

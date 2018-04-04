@@ -9,7 +9,7 @@
 from .utils_imports import *
 
 
-class NetBase:
+class BaseNet:
     """A abstract class for establish network.
 
     train_m and test_m must be implement in the subclass.
@@ -31,4 +31,7 @@ class NetBase:
         raise NotImplementedError
 
     def test_m(self):
+        raise NotImplementedError
+    
+    def visualize(self):
         raise NotImplementedError
