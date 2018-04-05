@@ -10,51 +10,6 @@
 """
 from .utils_imports import *
 
-################ CIFAR10 dataset ##################
-data_dir = PurePath('../../datasets/CIFAR10')
-tfs = {
-    'train':
-    transforms.Compose([
-        transforms.RandomCrop(32, padding=4),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-    ]),
-    'valid':
-    transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-    ]),
-    'test':
-    transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
-    ])
-}
-
-train_loader, valid_loader, test_loader = train_val_test_spilt(
-    data_dir, 'CIFAR10', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
-
-# classes
-classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-
-##########################################################
-
-####################### MNIST dataset ####################
-# tfs = {'train': transforms.ToTensor(), 'valid': transforms.ToTensor(), 'test': transforms.ToTensor()}
-# data_dir = PurePath('../../datasets/MNIST')
-# train_loader, valid_loader, test_loader = train_val_test_spilt(
-#     data_dir, 'MNIST', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
-##########################################################
-
-####################### FashionMNIST dataset ####################
-# tfs = {'train': transforms.ToTensor(), 'valid': transforms.ToTensor(), 'test': transforms.ToTensor()}
-# data_dir = PurePath('../../datasets/FashionMNIST')
-# train_loader, valid_loader, test_loader = train_val_test_spilt(
-#     data_dir, 'FashionMNIST', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
-#################################################################
-
-
 def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuffle, valid_size=0.1, num_workers=4, pin_memory=False):
     """Utility function for loading and returning a multi-process train, valid, test iterator over the dataset.
     
@@ -98,8 +53,6 @@ def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuf
         'LSUM': datasets.LSUN,
         'MNIST': datasets.MNIST,
         'FashionMNIST': datasets.FashionMNIST,
-        'EMNIST': datasets.EMNIST,
-        'Omniglot': datasets.Omniglot,
         'PhotoTour': datasets.PhotoTour,
         'SEMEION': datasets.SEMEION,
         'STL10': datasets.STL10,
@@ -130,3 +83,48 @@ def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuf
     test_loader = DataLoader(test_dataset, batch_size=batch_size[2], shuffle=shuffle[1], drop_last=False, num_workers=num_workers, pin_memory=pin_memory)
 
     return train_loader, valid_loader, test_loader
+
+# Examples
+################ CIFAR10 dataset ##################
+# data_dir = PurePath('datasets/CIFAR10')
+# tfs = {
+#     'train':
+#     transforms.Compose([
+#         transforms.RandomCrop(32, padding=4),
+#         transforms.RandomHorizontalFlip(),
+#         transforms.ToTensor(),
+#         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+#     ]),
+#     'valid':
+#     transforms.Compose([
+#         transforms.ToTensor(),
+#         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+#     ]),
+#     'test':
+#     transforms.Compose([
+#         transforms.ToTensor(),
+#         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+#     ])
+# }
+
+# train_loader, valid_loader, test_loader = train_val_test_spilt(
+#     data_dir, 'CIFAR10', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
+
+# # classes
+# classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+
+##########################################################
+
+####################### MNIST dataset ####################
+# tfs = {'train': transforms.ToTensor(), 'valid': transforms.ToTensor(), 'test': transforms.ToTensor()}
+# data_dir = PurePath('datasets/MNIST')
+# train_loader, valid_loader, test_loader = train_val_test_spilt(
+#     data_dir, 'MNIST', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
+##########################################################
+
+####################### FashionMNIST dataset ####################
+# tfs = {'train': transforms.ToTensor(), 'valid': transforms.ToTensor(), 'test': transforms.ToTensor()}
+# data_dir = PurePath('datasets/FashionMNIST')
+# train_loader, valid_loader, test_loader = train_val_test_spilt(
+#     data_dir, 'FashionMNIST', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
+#################################################################

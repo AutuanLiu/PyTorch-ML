@@ -7,7 +7,6 @@
     Date：2018/3/29
 """
 from .utils.utils_imports import *
-print(gpu)
 
 
 class SimpleCNN(nn.Module):
