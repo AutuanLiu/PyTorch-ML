@@ -20,3 +20,7 @@ wts_decay:
   ~
 prt_freq:
   5
+batch_sz:
+  64
+epochs:
+  500

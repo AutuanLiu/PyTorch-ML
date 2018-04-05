@@ -6,7 +6,8 @@
     Email : autuanliu@163.com
     Date：2018/04/02
 """
-from .utils_imports import *
+from .utils.utils_imports import *
+from .vislib.vis_imports *
 
 
 class BaseNet:
@@ -21,11 +22,28 @@ class BaseNet:
     """
 
     def __init__(self, config):
+        """initial the network
+        
+        Parameters:
+        ----------
+        config : dict
+            The configs of the network
+        """
         self.config = config
+        self.loss = []
+        self.accuracy = []
 
     @property
-    def config():
+    def config(self):
         return self.config
+
+    @property
+    def loss(self):
+        return self.loss
+
+    @property
+    def accuracy(self):
+        return self.accuracy
 
     def train_m(self):
         raise NotImplementedError

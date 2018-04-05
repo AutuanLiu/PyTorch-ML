@@ -21,4 +21,4 @@ class SimpleCNN(nn.Module):
 
 
 def simpleCNN():
-    pass
+    return SimpleCNN()

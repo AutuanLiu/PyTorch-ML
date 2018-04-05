@@ -20,7 +20,9 @@ configs = {
     "base_lr": None,
     "lrs_decay": None,
     "wts_decay": None,
-    "prt_freq": 5
+    "prt_freq": 5,
+    "batch_sz": 64,
+    "epochs": 500
 }
 
 # for json file
