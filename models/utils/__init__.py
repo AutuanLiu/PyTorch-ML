@@ -9,6 +9,5 @@
 from .lrs_scheduler import WarmRestart, cyclical_lr, clr_reset, warm_restart
 from .utils_imports import *
 from .make_dataloader import DataDef
-from .NetBase_class import NetBase
 
-__all__ = ['cyclical_lr', 'WarmRestart', 'DataDef', 'clr_reset', 'warm_restart', 'NetBase']
+__all__ = ['cyclical_lr', 'WarmRestart', 'DataDef', 'clr_reset', 'warm_restart']

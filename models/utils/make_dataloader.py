@@ -5,11 +5,7 @@
    Email : autuanliu@163.com
    Date：18-1-22
 """
-
-import numpy as np
-import pandas as pd
-import torch
-from torch.utils.data import Dataset
+from .utils_imports import *
 
 
 class DataDef(Dataset):

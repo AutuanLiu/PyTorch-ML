@@ -29,9 +29,9 @@ class Cos(lr_scheduler._LRScheduler):
                 self.cycle += 1
         else:
             self.cycle = int(math.floor(math.log(epoch / self.T_max * (self.T_mult - 1) + 1, self.T_mult)))
-            epoch -= sum([self.T_max * self.T_mult ** x for x in range(self.cycle)])
+            epoch -= sum([self.T_max * self.T_mult**x for x in range(self.cycle)])
         self.last_epoch = epoch
-        self.Ti = self.T_max * self.T_mult ** self.cycle
+        self.Ti = self.T_max * self.T_mult**self.cycle
         for param_group, lr in zip(self.optimizer.param_groups, self.get_lr()):
             param_group['lr'] = lr
 
@@ -41,7 +41,6 @@ class Cos(lr_scheduler._LRScheduler):
 
 net = Net()
 opt = optim.SGD([{'params': net.conv1.parameters()}, {'params': net.conv2.parameters(), 'lr': 0.5}], lr=0.05)
-
 
 epochs = 10
 eta_min = 1e-10

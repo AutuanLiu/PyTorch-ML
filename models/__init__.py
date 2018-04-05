@@ -8,3 +8,4 @@
 """
 from .utils import *
 from .vislib import *
+from .BaseNet_class import BaseNet

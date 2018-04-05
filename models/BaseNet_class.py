@@ -3,11 +3,13 @@
 """
 -------------------------------------------------
     Description :  A abstract class for establish network
+    1. https://github.com/kuangliu/pytorch-cifar/blob/master/main.py
+    2. https://github.com/gngdb/pytorch-cifar-sgdr
     Email : autuanliu@163.com
     Date：2018/04/02
 """
 from .utils.utils_imports import *
-from .vislib.vis_imports *
+from .vislib.vis_imports import *
 
 
 class BaseNet:
@@ -50,6 +52,6 @@ class BaseNet:
 
     def test_m(self):
         raise NotImplementedError
-    
+
     def visualize(self):
         raise NotImplementedError

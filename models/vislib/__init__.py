@@ -7,3 +7,4 @@
    Date：2018/3/30
 """
 from .vis_imports import *
+from .line_plot import line

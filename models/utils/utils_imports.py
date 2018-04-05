@@ -10,14 +10,14 @@ import copy, time, os, math
 from pathlib import PurePath
 from functools import wraps, reduce
 
-import Augmentor
+import Augmentor, pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np, torch, torchvision
 from torch import nn, optim
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.optim import lr_scheduler
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms, datasets
 
