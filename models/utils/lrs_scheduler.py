@@ -14,10 +14,9 @@
     Date：2018/3/22
 """
 from .utils_imports import *
-from torch.optim.lr_scheduler import CosineAnnealingLR
 
 
-class WarmRestart(CosineAnnealingLR):
+class WarmRestart(lr_scheduler.CosineAnnealingLR):
     """This class implements Stochastic Gradient Descent with Warm Restarts(SGDR): https://arxiv.org/abs/1608.03983.
     
     Set the learning rate of each parameter group using a cosine annealing schedule, When last_epoch=-1, sets initial lr as lr.

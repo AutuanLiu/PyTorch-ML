@@ -8,7 +8,7 @@
     Email : autuanliu@163.com
     Date：2018/04/05
 """
-from utils_imports import *
+from .utils_imports import *
 
 ################ CIFAR10 dataset ##################
 data_dir = PurePath('../../datasets/CIFAR10')

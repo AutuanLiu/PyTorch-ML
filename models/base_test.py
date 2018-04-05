@@ -8,7 +8,8 @@
 """
 from .utils.utils_imports import *
 from .BaseNet_class import BaseNet
-from .convNN import simpleCNN
+from .simpleNet import SimpleConv
+from .utils.get_data import train_val_test_spilt
 
 
 class Task(BaseNet):
@@ -22,13 +23,13 @@ class Task(BaseNet):
         pass
 
 
-def get_data(flag=True):
-    mnist = datasets.FashionMNIST('../datasets/fashionmnist/', train=flag, transform=transforms.ToTensor(), download=flag)
-    loader = DataLoader(mnist, batch_size=config['batch_size'], shuffle=flag, drop_last=False)
-    return loader
+data_dir = PurePath('../datasets/FashionMNIST')
+tfs = {'train': transforms.ToTensor(), 'valid': transforms.ToTensor(), 'test': transforms.ToTensor()}
+train_loader, valid_loader, test_loader = train_val_test_spilt(
+    data_dir, 'CIFAR10', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
 
 
-model = simpleCNN()
+model = SimpleConv()
 opt = optim.Adam(model.parameters(), lr=1e-3)
 configs = {
     "model": model,
@@ -41,5 +42,5 @@ configs = {
     "prt_freq": 5,
     "batch_sz": 64,
     "epochs": 500,
-    "checkpoint": PurePath(../logs/checkpoint/)
+    "checkpoint": PurePath('../logs/checkpoint/')
 }

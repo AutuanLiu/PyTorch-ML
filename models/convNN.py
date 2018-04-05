@@ -6,7 +6,7 @@
     Email : autuanliu@163.com
     Date：2018/3/29
 """
-from utils.utils_imports import *
+from .utils.utils_imports import *
 print(gpu)
 
 

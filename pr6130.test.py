@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+-------------------------------------------------
+    Description :  PR 6130 test
+    1. https://github.com/pytorch/pytorch/pull/6130#issuecomment-378699147
+    Email : autuanliu@163.com
+    Date：2018/04/01
+"""
 from models.utils.utils_imports import *
 from models.vislib.line_plot import line
 
