@@ -35,9 +35,16 @@ configs = {
     "model": model,
     "opt": opt,
     "criterion": nn.CrossEntropyLoss(),
-    "train_ldr": train_loader,
-    'valis_ldr': valid_loader,
-    "test_ldr": test_loader,
+    "dataloders": {
+        "train": train_loader,
+        'valid': valid_loader,
+        "test": test_loader
+        },
+    "data_sz": {
+        "train": 125,
+        "valid": 256,
+        "test": 126
+    },
     "base_lr": 1e-3,
     "lrs_decay": lr_scheduler.StepLR(opt, step_size=50),
     "prt_freq": 5,
