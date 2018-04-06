@@ -37,10 +37,17 @@ def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuf
     pin_memory : bool
         whether to copy tensors into CUDA pinned memory. Set it to True if using GPU. (the default is False)
     
-    Returns
-    -------
-    DataLoader
+    Returns:
+    --------
+    instances of DataLoader
         train_loader, valid_loader, test_loader
+    
+    Examples:
+    ---------
+    >>> tfs = {'train': transforms.ToTensor(), 'valid': transforms.ToTensor(), 'test': transforms.ToTensor()}
+    >>> data_dir = PurePath('datasets/MNIST')
+    >>> train_loader, valid_loader, test_loader = train_val_test_spilt(data_dir, 'MNIST', [64, 64, 64], tfs, 25,
+    >>>                                                                [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
     """
     assert ((valid_size >= 0) and (valid_size <= 1)), 'valid_size should be in the range [0, 1].'
 
@@ -113,13 +120,6 @@ def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuf
 # # classes
 # classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
-##########################################################
-
-####################### MNIST dataset ####################
-# tfs = {'train': transforms.ToTensor(), 'valid': transforms.ToTensor(), 'test': transforms.ToTensor()}
-# data_dir = PurePath('datasets/MNIST')
-# train_loader, valid_loader, test_loader = train_val_test_spilt(
-#     data_dir, 'MNIST', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
 ##########################################################
 
 ####################### FashionMNIST dataset ####################
