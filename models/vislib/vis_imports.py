@@ -9,6 +9,7 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 import tensorboardX
+from tensorboardX import SummaryWriter
 
 sns.set_style('whitegrid')
 sns.set_palette('Set1', 10, .75)

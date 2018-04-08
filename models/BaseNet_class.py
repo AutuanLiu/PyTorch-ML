@@ -16,7 +16,7 @@ from .vislib.vis_imports import *
 class BaseNet:
     """A abstract class for establish network.
 
-    train_m and test_m must be implement in the subclass.
+    train_m and test_m must function can be reimplement in the subclass.
 
     Attribute:
     ----------
@@ -24,110 +24,145 @@ class BaseNet:
         The config of model.
     """
 
-    def __init__(self, config):
+    def __init__(self, configs):
         """initial the network
         
         Parameters:
         ----------
-        config : dict
+        configs : dict
             The configs of the network
         """
-        self.config = config
-        self.loss = []
-        self.accuracy = []
+        self.model = configs['model']
+        self.opt = configs['opt']
+        self.criterion = configs['criterion']
+        self.dataloaders = configs['dataloaders']
+        self.lrs_decay = configs['lrs_decay']
+        self.prt_freq = configs['prt_freq']
+        self.epochs = configs['epochs']
+        self.checkpoint = configs['checkpoint']
         self.best_model_wts = None
         self.best_acc = 0.
         self.cost_time = 0.
+        self.res = {}
 
-    @property
-    def config(self):
-        """return a dict of model's configure."""
-        return self.config
-    
-    @config.setter
-    def set_config(self, value):
-        if not isinstance(value, dict):
-            raise ValueError('configure must be a Dict!')
-        self.config = value
-
-    @property
-    def loss(self):
-        """return a list of model's loss."""
-        return self.loss
-
-    @property
-    def accuracy(self):
-        """return a list of model's accuracy.(valid)"""
-        return self.accuracy
-    
     @property
     def best_model(self):
         """return a dict which save the best weights of model."""
         return self.best_model_wts
 
+    @property
+    def res_model(self):
+        """return a dict which save the loss and acc of model training and valid."""
+        return self.res
+
     def train_m(self):
         since = time.time()
+        loss_t, acc_t, loss_val, acc_val = [], [], [], []
         # save best model weights
-        self.best_model_wts = copy.deepcopy(self.config['model'].state_dict())
-        for epoch in range(self.config['epochs']):
+        self.best_model_wts = copy.deepcopy(self.model.state_dict())
+        for epoch in range(self.epochs):
             # Each epoch has a training and validation phase
             for phrase in ['train', 'valid']:
                 if phrase == 'train':
-                    if 'lrs_decay' in self.config:
+                    if 'lrs_decay' is not None:
                         # update learning rates
-                        self.config['lrs_decay'].step()
-                    self.config['model'].train(True)
+                        self.lrs_decay.step()
+                    self.model.train(True)
                 else:
-                    self.config['model'].train(False)
-                
+                    self.model.train(False)
+
                 # record the current epoch loss and corrects
                 cur_loss, cur_corrects = 0., 0
 
                 # train over minibatch
-                for batch_idx, (data, target) in enumerate(self.config['dataloaders'][phrase]):
+                for _, (data, target) in enumerate(self.dataloaders[phrase]):
                     if gpu:
                         data, target = Variable(data.cuda()), Variable(target.cuda())
+                        self.model = self.model.cuda()
                     else:
                         data, target = Variable(data), Variable(target)
-                    
+
                     # zero the buffer of parameters' gradient
-                    self.config['opt'].zero_grad()
+                    self.opt.zero_grad()
 
                     # forward
-                    out = self.config['model'](data)
+                    out = self.model(data)
                     _, y_pred = torch.max(out.data, 1)
-                    loss = self.config['criterion'](out, target)
+                    loss = self.criterion(out, target)
 
                     # backward in training phrase
                     if phrase == 'train':
                         loss.backward()
-                        self.config['opt'].step()
-                    
+                        self.opt.step()
+
                     # statistics
                     cur_loss += loss.data[0] * data.size(0)
-                    cur_corrects += torch.sum(y_pred == traget.data)
+                    cur_corrects += torch.sum(y_pred == target.data)
 
-                epoch_loss = cur_loss / self.config['data_sz'][phrase]
-                epoch_acc = cur_corrects / self.config['data_sz'][phrase]
-                if (epoch + 1) % self.config['prt_freq'] == 0:
-                    print(f'Epoch {epoch}/{self.config['epochs'] - 1}.\n', '*-*' * 20)
-                    print(f'{phrase}: Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
-                
+                epoch_loss = cur_loss / len(self.dataloaders[phrase].dataset)
+                epoch_acc = cur_corrects / len(self.dataloaders[phrase].dataset)
+                # save loss and acc
+                if phrase == 'train':
+                    loss_t.append(epoch_loss)
+                    acc_t.append(epoch_acc)
+                else:
+                    loss_val.append(epoch_loss)
+                    acc_val.append(epoch_acc)
+                self.res.setdefault('loss_train', loss_t)
+                self.res.setdefault('acc_train', acc_t)
+                self.res.setdefault('loss_val', loss_val)
+                self.res.setdefault('acc_val', acc_val)
+                if (epoch + 1) % self.prt_freq == 0:
+                    print(f'Epoch {epoch + 1}/{self.epochs} ---> {phrase}: Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+
                 # save the best model
                 if phrase == 'valid' and epoch_acc > self.best_acc:
                     self.best_acc = epoch_acc
-                    self.best_model_wts = copy.deepcopy(self.config['model'].state_dict())
+                    self.best_model_wts = copy.deepcopy(self.model.state_dict())
+        # save model
+            checkpoint = {
+                'epoch': epoch + 1,
+                'state_dict': self.model.state_dict(),
+                'best_prec1': self.best_acc,
+                'optimizer': self.opt.state_dict(),
+            }
+            self.save_checkpoint(checkpoint, f'checkpoint{epoch + 1}.pth.tar')
+        self.save_checkpoint(self.best_model_wts, 'best_model.pkl')
         self.cost_time = time.time() - since
         print(f'Training complete in {int(self.cost_time // 60)}m{self.cost_time % 60}s.')
         print(f'Best val acc: {self.best_acc:.4f}')
-        return self.load_model()
-                        
+
     def test_m(self):
-        self.config['model'].eval()
+        self.model = self.load_model()
+        self.model.eval()
+        test_loss, correct = 0, 0
+        for _, (data, target) in enumerate(self.dataloaders['test']):
+            if gpu:
+                data, target = Variable(data.cuda(), volatile=True), Variable(target.cuda())
+                self.model = self.model.cuda()
+            else:
+                data, target = Variable(data, volatile=True), Variable(target)
+            output = self.model(data)
+            # sum up batch loss
+            test_loss += self.criterion(output, target).data[0]
+            # get the index of the max
+            _, y_pred = output.data.max(1, keepdim=True)
+            correct += y_pred.eq(target.data.view_as(y_pred)).cpu().sum()
+
+        test_loss /= len(self.dataloaders['test'].dataset)
+        len1 = len(self.dataloaders['test'].dataset)
+        print(f'\nTest set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len1} ({100. * correct / len1:.0f}%)\n')
 
     def visualize(self):
         raise NotImplementedError
-    
+
     def load_model(self):
-        self.config['model'].load_state_dict(self.best_model_wts)
-        return self.config['model']
+        self.model.load_state_dict(self.best_model_wts)
+        # or
+        # self.model.load_state_dict(torch.load(self.checkpoint/'best_model.pkl'))
+        return self.model
+
+    def save_checkpoint(self, state, filename='checkpoint.pth.tar'):
+        torch.save(state, filename)
+        # shutil.copyfile(filename, self.checkpoint / filename)
+        shutil.move(filename, self.checkpoint / filename)

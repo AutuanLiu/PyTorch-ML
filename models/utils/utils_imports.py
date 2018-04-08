@@ -6,7 +6,7 @@
     Email : autuanliu@163.com
     Date：2018/3/27
 """
-import copy, time, os, math
+import copy, time, os, math, shutil
 from pathlib import PurePath
 from functools import wraps, reduce
 

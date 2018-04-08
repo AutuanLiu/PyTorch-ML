@@ -10,7 +10,8 @@
 """
 from .utils_imports import *
 
-def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuffle, valid_size=0.1, num_workers=4, pin_memory=False):
+
+def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuffle, valid_size=0.1, num_workers=0, pin_memory=False):
     """Utility function for loading and returning a multi-process train, valid, test iterator over the dataset.
     
     If using CUDA, num_workers should be set to 1 and pin_memory to True.
@@ -90,6 +91,7 @@ def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuf
     test_loader = DataLoader(test_dataset, batch_size=batch_size[2], shuffle=shuffle[1], drop_last=False, num_workers=num_workers, pin_memory=pin_memory)
 
     return train_loader, valid_loader, test_loader
+
 
 # Examples
 ################ CIFAR10 dataset ##################

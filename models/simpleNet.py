@@ -10,7 +10,6 @@ from .utils.utils_imports import *
 
 
 class SimpleConv(nn.Module):
-    
     def __init__(self):
         super().__init__()
         self.conv1 = nn.Conv2d(1, 10, 5)

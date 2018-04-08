@@ -12,6 +12,7 @@ from pathlib import PurePath
 
 data_dir = PurePath('../../datasets/antsbees/train')
 
+
 def aug(data_dir, nsample=None, save_format='JPEG'):
     """ image augmentation
     
@@ -55,6 +56,7 @@ def aug(data_dir, nsample=None, save_format='JPEG'):
         p.sample(nsample)
 
     return p.torch_transform()
+
 
 # example
 # x = aug(data_dir, 1000)
