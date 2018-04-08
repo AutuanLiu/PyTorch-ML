@@ -16,7 +16,7 @@ from .vislib.vis_imports import *
 
 
 class BaseNet:
-    """A abstract class for establish network.
+    """An abstract class for establish network.
 
     train_m and test_m must function can be reimplement in the subclass.
 

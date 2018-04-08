@@ -19,7 +19,7 @@ from torch.autograd import Variable
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
-from torchvision import transforms, datasets
+from torchvision import transforms, datasets, utils
 
 gpu = torch.cuda.is_available()
 gpu_cnt = torch.cuda.device_count()

@@ -1,7 +1,7 @@
 # PyTorch-DNN
 Implement DNN models and advanced policy with PyTorch.
 
-# Requirements
+## Requirements
 1. torch >= 0.3.1
 2. torchvision >= 0.2.0
 
@@ -17,6 +17,25 @@ scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
 ```python
 torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100, eta_min=1e-8, T_mult=2)
 # T_max < training epochs if you want to use restart policy
+```
+3. [An abstract class for establish network](models/BaseNet_calss.py)
+```python
+from models.BaseNet_class import BaseNet
+# some configs setting
+configs = {
+    'model': net,
+    'opt': opt,
+    'criterion': nn.CrossEntropyLoss(),
+    'dataloaders': ...,
+    'data_sz': ...,
+    'lrs_decay': lr_scheduler.StepLR(opt, step_size=50),
+    'prt_freq': 5,
+    'epochs': 500,
+}
+sub_model = BaseNet(configs)
+# train and test
+sub_model.train_m()
+sub_model.test_m()
 ```
 
 ## Related papers
