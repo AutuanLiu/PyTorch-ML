@@ -12,6 +12,8 @@
 from .utils.utils_imports import *
 from .vislib.vis_imports import *
 
+# from .utils.logger import Logger
+
 
 class BaseNet:
     """A abstract class for establish network.
@@ -40,10 +42,16 @@ class BaseNet:
         self.prt_freq = configs['prt_freq']
         self.epochs = configs['epochs']
         self.checkpoint = configs['checkpoint']
+        self.visual_dir = configs['visual_dir']
+        self.prt_dir = configs['prt_dir']
+        self.data_sz = configs['data_sz']
         self.best_model_wts = None
         self.best_acc = 0.
         self.cost_time = 0.
         self.res = {}
+        if self.visual_dir is not None:
+            self.writer = SummaryWriter(self.visual_dir)
+            # self.writer = Logger(self.visual_dir)
 
     @property
     def best_model(self):
@@ -57,6 +65,12 @@ class BaseNet:
 
     def train_m(self):
         """Train and valid(model training and validing each epoch)."""
+        # create a file
+        if is_file_exist(self.prt_dir):
+            os.remove(self.prt_dir)
+        with open(self.prt_dir, 'w') as f:
+            f.write("Model's training logs\n")
+
         since = time.time()
         loss_t, acc_t, loss_val, acc_val = [], [], [], []
         # save best model weights
@@ -77,11 +91,12 @@ class BaseNet:
 
                 # train over minibatch
                 for _, (data, target) in enumerate(self.dataloaders[phrase]):
-                    self.model, data, target = self.trans2gpu(self.model, data, target, volatile=False)
-
-                    # zero the buffer of parameters' gradient
-                    self.opt.zero_grad()
-
+                    if phrase == 'train':
+                        # zero the buffer of parameters' gradient
+                        self.model, data, target = self.trans2gpu(self.model, data, target, volatile=False)
+                        self.opt.zero_grad()
+                    else:
+                        self.model, data, target = self.trans2gpu(self.model, data, target, volatile=True)
                     # forward
                     out = self.model(data)
                     _, y_pred = torch.max(out.data, 1)
@@ -89,28 +104,36 @@ class BaseNet:
 
                     # backward in training phrase
                     if phrase == 'train':
+                        # zero the buffer of parameters' gradient
+                        self.opt.zero_grad()
                         loss.backward()
                         self.opt.step()
 
                     # statistics
                     cur_loss += loss.data[0] * data.size(0)
                     cur_corrects += torch.sum(y_pred == target.data)
-
-                epoch_loss = cur_loss / len(self.dataloaders[phrase].dataset)
-                epoch_acc = cur_corrects / len(self.dataloaders[phrase].dataset)
+                epoch_loss = cur_loss / self.data_sz[phrase]
+                epoch_acc = cur_corrects / self.data_sz[phrase]
                 # save loss and acc
                 if phrase == 'train':
                     loss_t.append(epoch_loss)
                     acc_t.append(epoch_acc)
+                    # self.visualize({'train_loss': epoch_loss, 'train_acc': epoch_acc}, epoch)
+                    # self.visualize({'train_loss': epoch_loss, 'train_acc': epoch_acc}, epoch, scaler=False)
+                    self.writer.add_scalars('train', {'train_loss': epoch_loss, 'train_acc': epoch_acc}, epoch)
                 else:
                     loss_val.append(epoch_loss)
                     acc_val.append(epoch_acc)
+                    # self.visualize({'valid_loss': epoch_loss, 'valid_acc': epoch_acc}, epoch)
+                    # self.writer.add_scalars('valid', {'valid_loss': epoch_loss, 'valid_acc': epoch_acc}, epoch)
                 self.res.setdefault('loss_train', loss_t)
                 self.res.setdefault('acc_train', acc_t)
                 self.res.setdefault('loss_val', loss_val)
                 self.res.setdefault('acc_val', acc_val)
+                f = open(self.prt_dir, 'a')
                 if (epoch + 1) % self.prt_freq == 0:
-                    print(f'Epoch {epoch + 1}/{self.epochs} ---> {phrase}: Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+                    print(f'Epoch {(epoch + 1):5d}/{self.epochs} ---> {phrase}: Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+                    f.write(f'Epoch {(epoch + 1):5d}/{self.epochs} ---> {phrase}: Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}\n')
 
                 # save the best model
                 if phrase == 'valid' and epoch_acc > self.best_acc:
@@ -128,6 +151,8 @@ class BaseNet:
         self.cost_time = time.time() - since
         print(f'Training complete in {int(self.cost_time // 60)}m{self.cost_time % 60}s.')
         print(f'Best val acc: {self.best_acc:.4f}')
+        f.write(f'Best val acc: {self.best_acc:.4f}\n')
+        f.close()
 
     def test_m(self):
         """Using the best model weights to test the test-dataset."""
@@ -140,16 +165,25 @@ class BaseNet:
             # sum up batch loss
             test_loss += self.criterion(output, target).data[0]
             # get the index of the max
-            _, y_pred = output.data.max(1, keepdim=True)
-            correct += y_pred.eq(target.data.view_as(y_pred)).cpu().sum()
+            _, y_pred = torch.max(output.data, 1)
+            correct += torch.sum(y_pred == target.data)
 
         test_loss /= len(self.dataloaders['test'].dataset)
         len1 = len(self.dataloaders['test'].dataset)
-        print(f'\nTest set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len1} ({100. * correct / len1:.0f}%)\n')
+        print(f'\nTest set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len1} ({100. * correct / len1:.0f}%)')
+        with open(self.prt_dir, 'a') as f:
+            f.write(f'\nTest set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len1} ({100. * correct / len1:.0f}%)')
 
-    def visualize(self):
+    def visualize(self, info, epoch, scaler=True):
         """Visualizing the model(training loss, acc etc.)."""
-        raise NotImplementedError
+        if scaler:
+            for tag, value in info.items():
+                self.writer.scalar_summary(tag, value, epoch + 1)
+        else:
+            for tag, value in self.model.named_parameters():
+                tag = tag.replace('.', '/')
+                self.writer.histo_summary(tag, value.data.cpu().numpy(), epoch + 1)
+                self.writer.histo_summary(tag + '/grad', value.grad.data.cpu().numpy(), epoch + 1)
 
     def load_model(self):
         self.model.load_state_dict(self.best_model_wts)
@@ -162,7 +196,7 @@ class BaseNet:
         torch.save(state, filename)
         # shutil.copyfile(filename, self.checkpoint / filename)
         shutil.move(filename, self.checkpoint / filename)
-    
+
     def trans2gpu(self, mod, data, target, volatile=False):
         """ If volatile is setted False, it will ensure that no intermediate states are saved."""
         if gpu:

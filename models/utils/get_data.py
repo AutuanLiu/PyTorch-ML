@@ -11,7 +11,7 @@
 from .utils_imports import *
 
 
-def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuffle, valid_size=0.1, num_workers=0, pin_memory=False):
+def train_val_test_spilt(data_dir, data_name, batch_size, tfs, shuffle, random_seed=1234, valid_size=0.1, num_workers=0, pin_memory=False):
     """Utility function for loading and returning a multi-process train, valid, test iterator over the dataset.
     
     If using CUDA, num_workers should be set to 1 and pin_memory to True.
@@ -41,7 +41,7 @@ def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuf
     Returns:
     --------
     instances of DataLoader
-        train_loader, valid_loader, test_loader
+        (train_loader, valid_loader, test_loader) and (len(train_idx), len(valid_idx), len(test_loader.dataset))
     
     Examples:
     ---------
@@ -90,7 +90,7 @@ def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuf
     valid_loader = DataLoader(valid_dataset, batch_size=batch_size[1], sampler=valid_sampler, drop_last=False, num_workers=num_workers, pin_memory=pin_memory)
     test_loader = DataLoader(test_dataset, batch_size=batch_size[2], shuffle=shuffle[1], drop_last=False, num_workers=num_workers, pin_memory=pin_memory)
 
-    return train_loader, valid_loader, test_loader
+    return (train_loader, valid_loader, test_loader), (len(train_idx), len(valid_idx), len(test_loader.dataset))
 
 
 # Examples
@@ -116,8 +116,8 @@ def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuf
 #     ])
 # }
 
-# train_loader, valid_loader, test_loader = train_val_test_spilt(
-#     data_dir, 'CIFAR10', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
+# loders, szs = train_val_test_spilt(data_dir, 'CIFAR10', [64, 64, 64], tfs, 25, [True, False],
+# valid_size=0.1, num_workers=4, pin_memory=False)
 
 # # classes
 # classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
@@ -127,6 +127,6 @@ def train_val_test_spilt(data_dir, data_name, batch_size, tfs, random_seed, shuf
 ####################### FashionMNIST dataset ####################
 # tfs = {'train': transforms.ToTensor(), 'valid': transforms.ToTensor(), 'test': transforms.ToTensor()}
 # data_dir = PurePath('datasets/FashionMNIST')
-# train_loader, valid_loader, test_loader = train_val_test_spilt(
+# loders, szs = train_val_test_spilt(
 #     data_dir, 'FashionMNIST', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=4, pin_memory=False)
 #################################################################
