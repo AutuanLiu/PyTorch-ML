@@ -12,10 +12,10 @@ from models.simpleNet import SimpleConv
 from models.utils.get_data import train_val_test_spilt
 
 # get data and configures
-data_dir = PurePath('datasets/MNIST')
+data_dir = PurePath('datasets/FashionMNIST')
 tfs = {'train': transforms.ToTensor(), 'valid': transforms.ToTensor(), 'test': transforms.ToTensor()}
 train_loader, valid_loader, test_loader = train_val_test_spilt(
-    data_dir, 'MNIST', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=0, pin_memory=False)
+    data_dir, 'FashionMNIST', [64, 64, 64], tfs, 25, [True, False], valid_size=0.1, num_workers=0, pin_memory=False)
 
 net = SimpleConv()
 opt = optim.Adam(net.parameters(), lr=1e-3)
@@ -29,20 +29,21 @@ configs = {
         'test': test_loader
     },
     'lrs_decay': lr_scheduler.StepLR(opt, step_size=50),
-    'prt_freq': 1,
-    'epochs': 2,
+    'prt_freq': 5,
+    'epochs': 500,
     'checkpoint': PurePath('logs/checkpoint/')
 }
 
 # construct sub-model from BaseNet
 sub_model = BaseNet(configs)
+# train and test
 sub_model.train_m()
 sub_model.test_m()
 
 # get property
-print(sub_model.res)
-print(sub_model.best_acc)
+# print(sub_model.res)
+# print(sub_model.best_acc)
 print(sub_model.best_model)
-print(sub_model.res_model)
-print(sub_model.best_model_wts)
-print(sub_model)
+# print(sub_model.res_model)
+# print(sub_model.best_model_wts)
+# print(sub_model)

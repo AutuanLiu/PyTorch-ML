@@ -56,6 +56,7 @@ class BaseNet:
         return self.res
 
     def train_m(self):
+        """Train and valid(model training and validing each epoch)."""
         since = time.time()
         loss_t, acc_t, loss_val, acc_val = [], [], [], []
         # save best model weights
@@ -76,11 +77,7 @@ class BaseNet:
 
                 # train over minibatch
                 for _, (data, target) in enumerate(self.dataloaders[phrase]):
-                    if gpu:
-                        data, target = Variable(data.cuda()), Variable(target.cuda())
-                        self.model = self.model.cuda()
-                    else:
-                        data, target = Variable(data), Variable(target)
+                    self.model, data, target = self.trans2gpu(self.model, data, target, volatile=False)
 
                     # zero the buffer of parameters' gradient
                     self.opt.zero_grad()
@@ -133,15 +130,12 @@ class BaseNet:
         print(f'Best val acc: {self.best_acc:.4f}')
 
     def test_m(self):
+        """Using the best model weights to test the test-dataset."""
         self.model = self.load_model()
         self.model.eval()
         test_loss, correct = 0, 0
         for _, (data, target) in enumerate(self.dataloaders['test']):
-            if gpu:
-                data, target = Variable(data.cuda(), volatile=True), Variable(target.cuda())
-                self.model = self.model.cuda()
-            else:
-                data, target = Variable(data, volatile=True), Variable(target)
+            self.model, data, target = self.trans2gpu(self.model, data, target, volatile=True)
             output = self.model(data)
             # sum up batch loss
             test_loss += self.criterion(output, target).data[0]
@@ -154,6 +148,7 @@ class BaseNet:
         print(f'\nTest set: Average loss: {test_loss:.4f}, Accuracy: {correct}/{len1} ({100. * correct / len1:.0f}%)\n')
 
     def visualize(self):
+        """Visualizing the model(training loss, acc etc.)."""
         raise NotImplementedError
 
     def load_model(self):
@@ -163,6 +158,17 @@ class BaseNet:
         return self.model
 
     def save_checkpoint(self, state, filename='checkpoint.pth.tar'):
+        """Save checkpoint and best model."""
         torch.save(state, filename)
         # shutil.copyfile(filename, self.checkpoint / filename)
         shutil.move(filename, self.checkpoint / filename)
+    
+    def trans2gpu(self, mod, data, target, volatile=False):
+        """ If volatile is setted False, it will ensure that no intermediate states are saved."""
+        if gpu:
+            inputs, outputs = Variable(data.cuda(), volatile=volatile), Variable(target.cuda())
+            model = mod.cuda()
+        else:
+            inputs, outputs = Variable(data, volatile=volatile), Variable(target)
+            model = mod
+        return model, inputs, outputs
