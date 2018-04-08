@@ -49,10 +49,10 @@ sub_model.train_m()
 sub_model.test_m()
 # sub_model.visualize()
 
-    # get property
-    # print(sub_model.res)
-    # print(sub_model.best_acc)
-    # print(sub_model.best_model)
-    # print(sub_model.res_model)
-    # print(sub_model.best_model_wts)
-    # print(sub_model)
+# get property
+# print(sub_model.res)
+# print(sub_model.best_acc)
+# print(sub_model.best_model)
+# print(sub_model.res_model)
+# print(sub_model.best_model_wts)
+# print(sub_model)
