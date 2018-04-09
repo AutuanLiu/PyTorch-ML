@@ -6,10 +6,10 @@
     Email : autuanliu@163.com
     Date：2018/04/05
 """
-from models.utils.utils_imports import *
 from models.BaseNet_class import BaseNet
 from models.simpleNet import SimpleConv
 from models.utils.get_data import train_val_test_spilt
+from models.utils.utils_imports import *
 
 # get data and configures
 data_dir = PurePath('datasets/FashionMNIST')
@@ -36,7 +36,7 @@ configs = {
     },
     'lrs_decay': lr_scheduler.StepLR(opt, step_size=50),
     'prt_freq': 5,
-    'epochs': 100,
+    'epochs': 500,
     'checkpoint': PurePath('logs/checkpoint'),
     'visual_dir': 'logs/visual',
     'prt_dir': PurePath('logs/prt/prt_log.txt')
@@ -47,6 +47,7 @@ sub_model = BaseNet(configs)
 # train and test
 sub_model.train_m()
 sub_model.test_m()
+sub_model.loss_acc_plot()
 # sub_model.visualize()
 
 # get property

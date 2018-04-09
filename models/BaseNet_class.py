@@ -11,6 +11,7 @@
 """
 from .utils.utils_imports import *
 from .vislib.vis_imports import *
+from .vislib.line_plot import line
 
 # from .utils.logger import Logger
 
@@ -205,3 +206,9 @@ class BaseNet:
             inputs, outputs = Variable(data, volatile=volatile), Variable(target)
             model = mod
         return model, inputs, outputs
+    
+    def loss_acc_plot(self):
+        for k, v in self.res.items():
+            line(v, x_label='epoch', y_label=k, title=k)
+            plt.savefig('logs/'+ k + '.jpg', dpi=600)
+        plt.show()
