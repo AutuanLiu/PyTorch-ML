@@ -126,10 +126,9 @@ class BaseNet:
                     acc_val.append(epoch_acc)
                     # self.visualize({'valid_loss': epoch_loss, 'valid_acc': epoch_acc}, epoch)
                     # self.writer.add_scalars('valid', {'valid_loss': epoch_loss, 'valid_acc': epoch_acc}, epoch)
-                self.res.setdefault('loss_train', loss_t)
-                self.res.setdefault('acc_train', acc_t)
-                self.res.setdefault('loss_val', loss_val)
-                self.res.setdefault('acc_val', acc_val)
+                for k, v in zip(['loss_train', 'acc_train', 'loss_val', 'acc_val'], [loss_t, acc_t, loss_val, acc_val]):
+                    self.res.setdefault(k, v)
+
                 f = open(self.prt_dir, 'a')
                 if (epoch + 1) % self.prt_freq == 0:
                     print(f'Epoch {(epoch + 1):5d}/{self.epochs} ---> {phrase}: Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
