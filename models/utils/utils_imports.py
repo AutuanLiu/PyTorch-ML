@@ -3,6 +3,7 @@
 """
 -------------------------------------------------
     Description :  some necessary imports 
+    1. https://github.com/kuangliu/pytorch-cifar/blob/master/utils.py
     Email : autuanliu@163.com
     Date：2018/3/27
 """
@@ -47,3 +48,30 @@ def is_file_exist(filename):
 
 def is_folder_exist(dirname):
     return os.path.exists(dirname)
+
+def init_params(net):
+    """Init layer parameters."""
+    for m in net.modules():
+        if isinstance(m, nn.Conv2d):
+            init.kaiming_normal(m.weight, mode='fan_out')
+            if m.bias:
+                init.constant(m.bias, 0)
+        elif isinstance(m, nn.BatchNorm2d):
+            init.constant(m.weight, 1)
+            init.constant(m.bias, 0)
+        elif isinstance(m, nn.Linear):
+            init.normal(m.weight, std=1e-3)
+            if m.bias:
+                init.constant(m.bias, 0)
+
+
+def one_hot_encoding(labels, num_classes):
+    """Embedding labels to one-hot.
+    Args:
+      labels: (LongTensor) class labels, sized [N,].
+      num_classes: (int) number of classes.
+    Returns:
+      (tensor) encoded labels, sized [N,#classes].
+    """
+    y = torch.eye(num_classes)  # [D,D]
+    return y[labels]            # [N,D]
