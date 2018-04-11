@@ -64,6 +64,14 @@ class BaseNet:
         """return a dict which save the loss and acc of model training and valid."""
         return self.res
 
+    def __getstate__(self):
+        state = self.__dict__
+        del state['writer']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
     def train_m(self):
         """Train and valid(model training and validing each epoch)."""
         # create a file
