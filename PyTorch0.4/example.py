@@ -71,7 +71,7 @@ def test_m(mod, data_loader):
 if __name__ == '__main__':
     start = time.time()
     # some config
-    config = {'batch_size': 64, 'epoch_num': 40, 'lr': 0.001, 'in_feature': 28 * 28, 'out_feature': 10}
+    config = {'batch_size': 64, 'epoch_num': 50, 'lr': 0.001, 'in_feature': 28 * 28, 'out_feature': 10}
     train_loader, test_loader = get_data(), get_data(flag=False)
     # 模型实例与损失函数, 优化函数
     model = Network().to(device)
@@ -82,4 +82,4 @@ if __name__ == '__main__':
         train_m(model, train_loader)
     test_m(model, test_loader)
     end = time.time()
-    print(f'spent time: {end - start}')
+    print(f'spent time: {(end - start) // 60} min {(end - start) % 60} s.')
