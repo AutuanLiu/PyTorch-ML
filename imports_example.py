@@ -17,8 +17,8 @@ model = nn.Sequential(nn.Linear(4, 1, bias=False), nn.Sigmoid())
 
 criterion = nn.BCELoss()
 opt = optim.SGD(model.parameters(), lr=0.001, momentum=0.5)
-data = Variable(torch.from_numpy(data).type(torch.FloatTensor))
-target = Variable(torch.from_numpy(target).type(torch.FloatTensor))
+data = torch.from_numpy(data).type(torch.FloatTensor)
+target = torch.from_numpy(target).type(torch.FloatTensor).reshape([100, 1])
 
 
 # train
@@ -29,8 +29,8 @@ def train(nepoch):
         opt.zero_grad()
         loss.backward()
         opt.step()
-        print(f'train epoch {epoch + 1} loss {loss.data[0]}')
+        print(f'train epoch {epoch + 1} loss {loss.item()}')
 
 
 # process
-train(5000)
+train(100)
