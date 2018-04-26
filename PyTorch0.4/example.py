@@ -96,6 +96,6 @@ if __name__ == '__main__':
     # 训练与测试
     for epoch in range(config['epoch_num']):
         train_m(model, train_loader)
-    test_m(model, test_loader)
+        test_m(model, test_loader)
     end = time.time()
     print(f'spent time: {(end - start) // 60} min {(end - start) % 60} s.')
