@@ -42,3 +42,6 @@ sub_model.test_m()
 1. [[1608.03983] SGDR: Stochastic Gradient Descent with Warm Restarts](https://arxiv.org/abs/1608.03983)
 2. [[1506.01186] Cyclical Learning Rates for Training Neural Networks](https://arxiv.org/abs/1506.01186)
 3. [[1704.00109] Snapshot Ensembles: Train 1, get M for free](https://arxiv.org/abs/1704.00109)
+
+## Related references
+1. [Another data science student's blog](https://sgugger.github.io/)
