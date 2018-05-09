@@ -115,4 +115,5 @@ dependencies:
   - kaggle-cli
   - kaggle
   - ipywidgets
+  - Augmentor
     #- git+https://github.com/SauceCat/PDPbox.git

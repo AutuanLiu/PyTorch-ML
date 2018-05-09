@@ -22,7 +22,7 @@ class Net(nn.Module):
 
 
 net = Net()
-opt = optim.SGD(net.parameters(), lr=1.)
+opt = optim.SGD(net.parameters(), lr=0.5)
 
 # step_sz is 2~10 * len(datasets)/minibatch
 step_size = 10
