@@ -10,6 +10,7 @@
     4. https://github.com/pytorch/pytorch/blob/master/torch/optim/lr_scheduler.py
     5. https://github.com/bckenstler/CLR
     6. https://github.com/fastai/fastai/blob/master/fastai/sgdr.py
+    7. https://github.com/NVIDIA/nvvl/blob/master/examples/pytorch_superres/model/clr.py
     Email : autuanliu@163.com
     Date：2018/3/22
 """
