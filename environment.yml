@@ -98,7 +98,10 @@ dependencies:
 - widgetsnbextension
 - xz
 - zeromq
+# GPU version
 - pytorch
+# CPU version
+# - pytorch-cpu
 - bcolz
 - prompt_toolkit
 - pytest
@@ -116,4 +119,5 @@ dependencies:
   - kaggle
   - ipywidgets
   - Augmentor
+  - cryptography
     #- git+https://github.com/SauceCat/PDPbox.git
