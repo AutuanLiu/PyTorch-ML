@@ -24,6 +24,7 @@ from torchvision import transforms, datasets, utils
 
 gpu = torch.cuda.is_available()
 gpu_cnt = torch.cuda.device_count()
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 
 # model string

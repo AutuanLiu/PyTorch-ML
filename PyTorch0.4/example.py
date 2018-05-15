@@ -17,21 +17,6 @@ def get_data(flag=True):
 
 # 网络模型定义
 class Network(Module):
-    # def __init__(self):
-    #     super().__init__()
-    #     self.l1 = torch.nn.Linear(config['in_feature'], 500)
-    #     self.l2 = torch.nn.Linear(500, 350)
-    #     self.l3 = torch.nn.Linear(350, 200)
-    #     self.l4 = torch.nn.Linear(200, 130)
-    #     self.l5 = torch.nn.Linear(130, config['out_feature'])
-
-    # def forward(self, x):
-    #     data = x.view(-1, config['in_feature'])
-    #     y = F.relu(self.l1(data))
-    #     y = F.relu(self.l2(y))
-    #     y = F.relu(self.l3(y))
-    #     y = F.relu(self.l4(y))
-    #     return self.l5(y)
     def __init__(self):
         super().__init__()
         self.conv1 = torch.nn.Conv2d(1, 10, kernel_size=5)
