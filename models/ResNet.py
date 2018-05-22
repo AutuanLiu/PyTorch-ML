@@ -5,15 +5,16 @@
     Description :  ResNet
     Email : autuanliu@163.com
     ref:
-    1. https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
-    2. https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
-    3. https://arxiv.org/abs/1512.03385
-    4. https://github.com/KaimingHe/deep-residual-networks
-    5. http://ethereon.github.io/netscope/#/gist/db945b393d40bfa26006
-    6. http://ethereon.github.io/netscope/#/gist/b21e2aae116dc1ac7b50
-    7. http://ethereon.github.io/netscope/#/gist/d38f3e6091952b45198b
-    8. https://github.com/raghakot/keras-resnet/blob/master/resnet.py
-    9. https://github.com/gcr/torch-residual-networks
+    1.  https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
+    2.  https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
+    3.  https://arxiv.org/abs/1512.03385
+    4.  https://github.com/KaimingHe/deep-residual-networks
+    5.  http://ethereon.github.io/netscope/#/gist/db945b393d40bfa26006
+    6.  http://ethereon.github.io/netscope/#/gist/b21e2aae116dc1ac7b50
+    7.  http://ethereon.github.io/netscope/#/gist/d38f3e6091952b45198b
+    8.  https://github.com/raghakot/keras-resnet/blob/master/resnet.py
+    9.  https://github.com/gcr/torch-residual-networks
+    10. https://github.com/ycszen/pytorch-segmentation/blob/master/resnet.py
     Date：2018/05/14
 """
 import torch
