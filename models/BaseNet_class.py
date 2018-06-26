@@ -120,7 +120,8 @@ class BaseNet:
 
                     # statistics
                     cur_loss += loss.item() * data.size(0)
-                    cur_corrects += torch.sum(y_pred == target.data)
+                    cur_corrects += torch.sum(y_pred == target.data).item()
+                    # cur_corrects += y_pred.eq(target.data.view_as(y_pred)).cpu().sum()
                 epoch_loss = cur_loss / self.data_sz[phrase]
                 epoch_acc = cur_corrects / self.data_sz[phrase]
                 # save loss and acc
@@ -142,7 +143,6 @@ class BaseNet:
                 if (epoch + 1) % self.prt_freq == 0:
                     print(f'Epoch {(epoch + 1):5d}/{self.epochs} ---> {phrase}: Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
                     f.write(f'Epoch {(epoch + 1):5d}/{self.epochs} ---> {phrase}: Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}\n')
-
                 # save the best model
                 if phrase == 'valid' and epoch_acc > self.best_acc:
                     self.best_acc = epoch_acc

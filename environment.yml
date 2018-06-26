@@ -7,7 +7,7 @@ channels:
 - peterjc123
 dependencies:
 - scipy
-- cuda80
+- cuda90
 - cudnn
 - numpy
 - pillow

@@ -36,7 +36,7 @@ configs = {
     },
     'lrs_decay': lr_scheduler.StepLR(opt, step_size=50),
     'prt_freq': 5,
-    'epochs': 500,
+    'epochs': 150,
     'checkpoint': PurePath('logs/checkpoint'),
     'visual_dir': 'logs/visual',
     'prt_dir': PurePath('logs/prt/prt_log.txt')
