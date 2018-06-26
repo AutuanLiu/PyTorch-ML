@@ -102,10 +102,10 @@ class BaseNet:
                 for _, (data, target) in enumerate(self.dataloaders[phrase]):
                     if phrase == 'train':
                         # zero the buffer of parameters' gradient
-                        self.model, data, target = self.trans2gpu(self.model, data, target, volatile=False)
+                        self.model, data, target = self.model.to(device), data.to(device), target.to(device)
                         self.opt.zero_grad()
                     else:
-                        self.model, data, target = self.trans2gpu(self.model, data, target, volatile=True)
+                        self.model, data, target = self.model.to(device), data.to(device), target.to(device)
                     # forward
                     out = self.model(data)
                     _, y_pred = torch.max(out.data, 1)
@@ -119,7 +119,7 @@ class BaseNet:
                         self.opt.step()
 
                     # statistics
-                    cur_loss += loss.data[0] * data.size(0)
+                    cur_loss += loss.item() * data.size(0)
                     cur_corrects += torch.sum(y_pred == target.data)
                 epoch_loss = cur_loss / self.data_sz[phrase]
                 epoch_acc = cur_corrects / self.data_sz[phrase]
@@ -168,10 +168,10 @@ class BaseNet:
         self.model.eval()
         test_loss, correct = 0, 0
         for _, (data, target) in enumerate(self.dataloaders['test']):
-            self.model, data, target = self.trans2gpu(self.model, data, target, volatile=True)
+            self.model, data, target = self.model.to(device), data.to(device), target.to(device)
             output = self.model(data)
             # sum up batch loss
-            test_loss += self.criterion(output, target).data[0]
+            test_loss += self.criterion(output, target).item()
             # get the index of the max
             _, y_pred = torch.max(output.data, 1)
             correct += torch.sum(y_pred == target.data)
@@ -205,16 +205,6 @@ class BaseNet:
         # shutil.copyfile(filename, self.checkpoint / filename)
         shutil.move(filename, self.checkpoint / filename)
 
-    def trans2gpu(self, mod, data, target, volatile=False):
-        """ If volatile is setted False, it will ensure that no intermediate states are saved."""
-        if gpu:
-            inputs, outputs = Variable(data.cuda(), volatile=volatile), Variable(target.cuda())
-            model = mod.cuda()
-        else:
-            inputs, outputs = Variable(data, volatile=volatile), Variable(target)
-            model = mod
-        return model, inputs, outputs
-    
     def loss_acc_plot(self):
         for k, v in self.res.items():
             line(v, x_label='epoch', y_label=k, title=k)

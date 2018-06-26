@@ -40,7 +40,7 @@ class Network(nn.Module):
 def train_m(mod, data_loader, scheduler):
     mod.train()
     for batch_idx, (data, target) in enumerate(data_loader):
-        data, target = Variable(data), Variable(target)
+        # data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
         output = mod.forward(data)
         loss = criterion.forward(output, target)
@@ -50,23 +50,23 @@ def train_m(mod, data_loader, scheduler):
 
         # learning sampler and visualize
         vis_lr.append(scheduler.get_lr())
-        vis_loss.append(loss.data[0])
+        vis_loss.append(loss.item())
 
         if batch_idx % 10 == 0:
             len1 = batch_idx * len(data)
             len2 = len(data_loader.dataset)
             pec = 100. * batch_idx / len(data_loader)
-            print(f"Train Epoch: {epoch + 1} [{len1:5d}/{len2:5d} ({pec:3.2f}%)] \t Loss: {loss.data[0]:.5f}")
+            print(f"Train Epoch: {epoch + 1} [{len1:5d}/{len2:5d} ({pec:3.2f}%)] \t Loss: {loss.item():.5f}")
 
 
 def test_m(mod, data_loader):
     mod.eval()
     test_loss, correct = 0, 0
     for data, target in data_loader:
-        data, target = Variable(data, volatile=True), Variable(target)
+        # data, target = Variable(data, volatile=True), Variable(target)
         output = mod(data)
         # sum up batch loss
-        test_loss += criterion(output, target).data[0]
+        test_loss += criterion(output, target).item()
         # get the index of the max
         _, pred = output.data.max(1, keepdim=True)
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
@@ -77,7 +77,7 @@ def test_m(mod, data_loader):
 
 
 # some config
-config = {'batch_size': 64, 'epoch_num': 10, 'lr': 0.05, 'in_feature': 28 * 28, 'out_feature': 10}
+config = {'batch_size': 64, 'epoch_num': 100, 'lr': 0.05, 'in_feature': 28 * 28, 'out_feature': 10}
 train_loader, test_loader = get_data(), get_data(flag=False)
 
 # model, criterion, optimizer
