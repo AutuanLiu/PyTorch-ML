@@ -77,7 +77,7 @@ if __name__ == '__main__':
     # 模型实例与损失函数, 优化函数
     model = Network().to(device)
     criterion = torch.nn.NLLLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=config['lr'], momentum=0.9)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config['lr'], amsgrad=True)
     # 训练与测试
     for epoch in range(config['epoch_num']):
         train_m(model, train_loader)
