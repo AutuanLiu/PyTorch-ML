@@ -6,7 +6,6 @@
     Email : autuanliu@163.com
     Date：2018/3/29
 """
-from models.utils.utils_imports import *
 from models.vislib.line_plot import line
 from models.utils.lrs_scheduler import *
 
@@ -41,6 +40,7 @@ def train_m(mod, data_loader, scheduler):
     mod.train()
     for batch_idx, (data, target) in enumerate(data_loader):
         # data, target = Variable(data), Variable(target)
+        data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
         output = mod.forward(data)
         loss = criterion.forward(output, target)
@@ -64,6 +64,7 @@ def test_m(mod, data_loader):
     test_loss, correct = 0, 0
     for data, target in data_loader:
         # data, target = Variable(data, volatile=True), Variable(target)
+        data, target = data.to(device), target.to(device)
         output = mod(data)
         # sum up batch loss
         test_loss += criterion(output, target).item()
@@ -81,7 +82,7 @@ config = {'batch_size': 64, 'epoch_num': 100, 'lr': 0.05, 'in_feature': 28 * 28,
 train_loader, test_loader = get_data(), get_data(flag=False)
 
 # model, criterion, optimizer
-model = Network(config)
+model = Network(config).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=config['lr'])
 
