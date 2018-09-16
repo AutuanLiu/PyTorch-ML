@@ -10,7 +10,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def get_data(flag=True):
-    mnist = FashionMNIST('../datasets/FashionMNIST/', train=flag, transform=transforms.ToTensor(), download=flag)
+    mnist = FashionMNIST('datasets/fashionmnist/', train=flag, transform=transforms.ToTensor(), download=flag)
     loader = torch.utils.data.DataLoader(mnist, batch_size=config['batch_size'], shuffle=flag, drop_last=False)
     return loader
 
