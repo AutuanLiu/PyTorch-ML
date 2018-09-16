@@ -9,5 +9,3 @@
 from .utils import *
 from .vislib import *
 from .BaseNet_class import BaseNet
-from .autoencoder import *
-from .convNN import *
