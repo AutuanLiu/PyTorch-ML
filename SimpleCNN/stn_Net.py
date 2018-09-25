@@ -83,7 +83,7 @@ model     = Net().to(dev)
 print(model)
 criterion = nn.CrossEntropyLoss(reduction='elementwise_mean')
 opt       = optim.Adam(model.parameters(), lr=0.001)
-n_epoch   = 50
+n_epoch   = 80
 
 # 训练网络
 model.train()
