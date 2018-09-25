@@ -54,6 +54,7 @@ opt          = optim.Adam(net.parameters(), lr=0.01)
 num_epoch    = 100
 
 # 训练网络
+net.train()
 for epoch in range(num_epoch):
     for idx, (img, label) in enumerate(train_loader):
         img, label = img.to(dev), label.to(dev)

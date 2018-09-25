@@ -59,9 +59,10 @@ net = CifarCNN().to(dev)
 print(net)
 criterion = nn.CrossEntropyLoss()
 opt = optim.Adam(net.parameters(), lr=1e-4)
-num_epoch = 100
+num_epoch = 60
 
 # 训练网络
+net.train()
 loss_his = torch.zeros(num_epoch)
 for epoch in range(num_epoch):
     for _, (img, label) in enumerate(train_loader):
@@ -99,7 +100,12 @@ for idx in range(n_class):
     print(f'Test acc of class {idx+1} is: { 100 * correct[idx] / total[idx].item():.4f}%')
 
 # 保存 checkpoint
+# 一般包含模型和优化器的可学习参数
 torch.save(net.state_dict(), 'SimpleCNN/cifarnet.ckpt')
+
+# 加载模型
+# checkpoint = torch.load('SimpleCNN/cifarnet.ckpt')
+# net.load_state_dict(checkpoint)
 
 # 可视化 loss
 plt.plot(loss_his.numpy())
