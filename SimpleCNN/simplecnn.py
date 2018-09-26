@@ -19,13 +19,14 @@ dev = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 class SimpleCNN(nn.Module):
     def __init__(self):
         super(SimpleCNN, self).__init__()
-        self.conv1 = nn.Conv2d(1, 6, 5)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc = nn.Sequential(nn.Linear(256, 120), nn.ReLU(), nn.Linear(120, 84), nn.ReLU(), nn.Linear(84, 10))
+        self.conv1 = nn.Conv2d(1, 10, 5)
+        self.conv2 = nn.Conv2d(10, 20, 5)
+        self.drop = nn.Dropout2d()
+        self.fc = nn.Sequential(nn.Linear(320, 120), nn.ReLU(), nn.Linear(120, 84), nn.ReLU(), nn.Linear(84, 10))
 
     def forward(self, x):
         out = F.max_pool2d(F.relu(self.conv1(x)), 2)
-        out = F.max_pool2d(F.relu(self.conv2(out)), 2)
+        out = F.max_pool2d(F.relu(self.drop(self.conv2(out))), 2)
         out = out.view(-1, out.numel() // out.shape[0])
         return self.fc(out)
 
