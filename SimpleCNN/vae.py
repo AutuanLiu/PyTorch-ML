@@ -13,12 +13,14 @@ from torchvision.utils import save_image
 # setting
 n_epoch = 10
 torch.manual_seed(1)
+root = 'datasets/fashionmnist'
 dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 # 获取数据
-train_loader = DataLoader(datasets.FashionMNIST('datasets/fashionmnist', train=True, download=True, transform=transforms.ToTensor()),
-                          batch_size=64, shuffle=True)
-test_loader = DataLoader(datasets.FashionMNIST('datasets/fashionmnist', train=False, transform=transforms.ToTensor()),
-                         batch_size=32, shuffle=True)
+train_loader = DataLoader(datasets.FashionMNIST(
+    root, train=True, download=True, transform=transforms.ToTensor()), batch_size=64, shuffle=True)
+test_loader = DataLoader(datasets.FashionMNIST(
+    root, train=False, transform=transforms.ToTensor()), batch_size=64, shuffle=True)
 
 
 class VAE(nn.Module):
@@ -56,7 +58,7 @@ class VAE(nn.Module):
 
 # 模型实例
 model = VAE().to(dev)
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.01)
 
 
 # Reconstruction + KL divergence losses summed over all elements and batch
@@ -77,9 +79,8 @@ def train(epoch):
         loss.backward()
         train_loss += loss.item()
         optimizer.step()
-        if batch_idx % 10 == 0:
-            print(f'Train Epoch: {epoch+1} [{batch_idx * len(data)}/{len(train_loader.dataset)} ({100. * batch_idx / len(train_loader):.0f}%)]\tLoss: {loss.item() / len(data):.6f}')
-    print(f'Epoch: {epoch+1} Average loss: {train_loss / len(train_loader.dataset):.4f}')
+    print(
+        f'Epoch: {epoch+1} Average loss: {train_loss / len(train_loader.dataset):.4f}')
 
 
 def test(epoch):
@@ -92,8 +93,10 @@ def test(epoch):
             test_loss += loss_function(recon_batch, data, mu, logvar).item()
             if i == 0:
                 n = min(data.size(0), 8)
-                comparison = torch.cat([data[:n], recon_batch.view(64, 1, 28, 28)[:n]])
-                save_image(comparison.cpu(), 'images/reconstruction_' + str(epoch) + '.png', nrow=n)
+                comparison = torch.cat(
+                    [data[:n], recon_batch.view(64, 1, 28, 28)[:n]])
+                save_image(comparison.cpu(),
+                           f'images/reconstruction_{str(epoch)}.png', nrow=n)
     test_loss /= len(test_loader.dataset)
     print(f'Test set loss: {test_loss:.4f}')
 
@@ -105,4 +108,5 @@ if __name__ == "__main__":
         with torch.no_grad():
             sample = torch.randn(64, 20).to(dev)
             sample = model.decode(sample).cpu()
-            save_image(sample.view(64, 1, 28, 28), 'images/sample_' + str(epoch) + '.png')
+            save_image(sample.view(64, 1, 28, 28),
+                       f'images/sample_{str(epoch)}.png')

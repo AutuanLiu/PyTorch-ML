@@ -5,8 +5,8 @@ Date: 2018/9/16
 
 import os
 
-import torch
 import matplotlib.pyplot as plt
+import torch
 import torch.nn.functional as F
 from torch import nn, optim
 from torch.utils.data import DataLoader
