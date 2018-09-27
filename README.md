@@ -2,8 +2,8 @@
 Implement DNN models and advanced policy with PyTorch.
 
 ## Requirements
-1. torch >= 0.3.1
-2. torchvision >= 0.2.0
+1. torch >= 0.4.0
+2. torchvision >= 0.2.1
 
 ## Content
 1. [Cyclical Learning Rates](CLR_example.py)
