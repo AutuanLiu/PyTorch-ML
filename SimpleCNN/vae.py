@@ -57,7 +57,9 @@ class VAE(nn.Module):
 
 
 # 模型实例
-model = VAE().to(dev)
+n_device = torch.cuda.device_count()
+print(f'let\'s use {n_device} GPUs!')
+model = nn.DataParallel(VAE()).to(dev) if n_device > 1 else VAE().to(dev)
 optimizer = optim.Adam(model.parameters(), lr=0.01)
 
 
