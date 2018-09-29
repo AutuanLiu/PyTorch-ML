@@ -79,7 +79,7 @@ class Net(nn.Module):
         return F.log_softmax(out, dim=1)
 
 # 实例化模型与配置
-model     = Net().to(dev)
+model     = nn.DataParallel(Net()).to(dev) if torch.cuda.device_count > 1 else Net().to(dev)
 print(model)
 criterion = nn.CrossEntropyLoss(reduction='elementwise_mean')
 opt       = optim.Adam(model.parameters(), lr=0.001)

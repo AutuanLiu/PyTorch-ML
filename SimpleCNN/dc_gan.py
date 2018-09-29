@@ -104,10 +104,10 @@ class Discriminator(nn.Module):
 
 
 # 初始化网络
-netG = Generator().to(dev)
+netG = nn.DataParallel(Generator()).to(dev) if torch.cuda.device_count() > 1 else Generator().to(dev)
 netG.apply(weights_init)
 print(netG)
-netD = Discriminator().to(dev)
+netD = nn.DataParallel(Discriminator()).to(dev) if torch.cuda.device_count() > 1 else Discriminator().to(dev)
 netD.apply(weights_init)
 print(netD)
 

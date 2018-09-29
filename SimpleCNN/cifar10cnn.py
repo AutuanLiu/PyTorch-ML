@@ -55,7 +55,7 @@ test_loader = get_data(flag=False, bs=32, tsfm=tfs)
 
 # 网络配置
 n_class = 10
-net = CifarCNN().to(dev)
+net = nn.DataParallel(CifarCNN()).to(dev) if torch.cuda.device_count() > 1 else CifarCNN().to(dev)
 print(net)
 criterion = nn.CrossEntropyLoss()
 opt = optim.Adam(net.parameters(), lr=1e-4)

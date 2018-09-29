@@ -43,7 +43,7 @@ def get_data(root='datasets/mnist/', flag=True, bs=64, trans=transforms.ToTensor
     return loader
     
 # 实例化网络
-net = SimpleCNN().to(dev)
+net = nn.DataParallel(SimpleCNN()).to(dev) if torch.cuda.device_count() > 1 else SimpleCNN().to(dev)
 print(net)
 
 # 网络配置
