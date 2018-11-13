@@ -21,23 +21,16 @@ transform = transforms.Compose([
     transforms.ToTensor()])
 
 # CIFAR-10 dataset
-train_dataset = torchvision.datasets.CIFAR10(root='datasets/',
-                                             train=True,
-                                             transform=transform,
-                                             download=True)
-
-test_dataset = torchvision.datasets.CIFAR10(root='datasets/',
-                                            train=False,
-                                            transform=transforms.ToTensor())
+train_dataset = torchvision.datasets.CIFAR10(
+    root='datasets/', train=True, transform=transform, download=True)
+test_dataset = torchvision.datasets.CIFAR10(
+    root='datasets/', train=False, transform=transforms.ToTensor())
 
 # Data loader
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                           batch_size=100,
-                                           shuffle=True)
-
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
-                                          batch_size=100,
-                                          shuffle=False)
+train_loader = torch.utils.data.DataLoader(
+    dataset=train_dataset, batch_size=100, shuffle=True)
+test_loader = torch.utils.data.DataLoader(
+    dataset=test_dataset, batch_size=100, shuffle=False)
 
 
 def conv3x3(in_channels, out_channels, stride=1):
@@ -120,10 +113,10 @@ h1.save('images/resnet.png', format='png')
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-# For updating learning rate
-
 
 def update_lr(optimizer, lr):
+    """For updating learning rate."""
+
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
