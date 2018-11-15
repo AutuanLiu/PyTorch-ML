@@ -23,7 +23,7 @@ class CifarCNN(nn.Module):
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool1 = nn.MaxPool2d(2, stride=2)
         self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(400 , 120)
+        self.fc1 = nn.Linear(400, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
@@ -37,7 +37,7 @@ class CifarCNN(nn.Module):
 
 
 # 获取数据
-def get_data(root='datasets/cifar10/', flag=True, bs=64, tsfm=transforms.ToTensor()):
+def get_data(root='datasets/', flag=True, bs=64, tsfm=transforms.ToTensor()):
     if not os.path.exists(root):
         os.makedirs(root)
         flag1 = True
@@ -48,18 +48,21 @@ def get_data(root='datasets/cifar10/', flag=True, bs=64, tsfm=transforms.ToTenso
     return loader
 
 
-tfs = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+tfs = transforms.Compose(
+    [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
 train_loader = get_data(bs=32, tsfm=tfs)
 test_loader = get_data(flag=False, bs=32, tsfm=tfs)
+classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 # 网络配置
 n_class = 10
-net = nn.DataParallel(CifarCNN()).to(dev) if torch.cuda.device_count() > 1 else CifarCNN().to(dev)
+net = nn.DataParallel(CifarCNN()).to(
+    dev) if torch.cuda.device_count() > 1 else CifarCNN().to(dev)
 print(net)
 criterion = nn.CrossEntropyLoss()
-opt = optim.Adam(net.parameters(), lr=1e-4)
-num_epoch = 60
+opt = optim.Adam(net.parameters(), lr=0.001)
+num_epoch = 5
 
 # 训练网络
 net.train()
@@ -70,7 +73,8 @@ for epoch in range(num_epoch):
 
         # 前向传播
         out = net.forward(img)    # or out = net(img)
-        loss = criterion.forward(out, label)    # or loss = criterion(out, label)
+        # or loss = criterion(out, label)
+        loss = criterion.forward(out, label)
 
         # 后向传播
         opt.zero_grad()
@@ -83,31 +87,35 @@ for epoch in range(num_epoch):
 
 # 评估网络(此时不需要计算grad)
 net.eval()
+net = net.cpu()
+class_correct = list(0. for i in range(10))
+class_total = list(0. for i in range(10))
 with torch.no_grad():
-    correct = total = torch.zeros(n_class).to(dev)
-    for img, label in test_loader:
-        img, label = img.to(dev), label.to(dev)
-        out = net(img)
-        _, pred = torch.max(out, 1)
-        len1 = label.shape[0] # 数据之前会隐藏一个维度 batchsize
-        is_correct = (pred == label)
-        # 对每个数据对判断
-        for idx in range(len1):
-            lbs_true = label[idx].item()
-            total[lbs_true] += 1
-            correct[lbs_true] += is_correct[idx].item()
-for idx in range(n_class):
-    print(f'Test acc of class {idx+1} is: { 100 * correct[idx] / total[idx].item():.4f}%')
+    for data in test_loader:
+        images, labels = data
+        outputs = net(images)
+        _, predicted = torch.max(outputs, 1)
+        c = (predicted == labels).squeeze()
+        for i in range(4):
+            label = labels[i]
+            class_correct[label] += c[i].item()
+            class_total[label] += 1
+
+for i in range(10):
+    print('Accuracy of %5s : %2d %%' % (
+        classes[i], 100 * class_correct[i] / class_total[i]))
 
 # 保存 checkpoint
 # 一般包含模型和优化器的可学习参数
-torch.save(net.state_dict(), 'SimpleCNN/cifarnet.ckpt')
+torch.save(net.state_dict(), 'CNN/cifarnet.ckpt')
 
 # 加载模型
-# checkpoint = torch.load('SimpleCNN/cifarnet.ckpt')
+# checkpoint = torch.load('CNN/cifarnet.ckpt')
 # net.load_state_dict(checkpoint)
 
 # 可视化 loss
 plt.plot(loss_his.numpy())
-plt.xlabel('epoch'); plt.ylabel('loss'); plt.title('epoch vs loss')
+plt.xlabel('epoch')
+plt.ylabel('loss')
+plt.title('epoch vs loss')
 plt.show()
