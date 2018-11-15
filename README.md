@@ -38,6 +38,24 @@ sub_model.train_m()
 sub_model.test_m()
 ```
 
+## CNN
+* ResNet
+* AlexNet
+* GoogLeNet
+* DenseNet
+* VGGNet
+* LeNet
+* GAN
+* NiN
+* STN
+* VAE
+  
+## RNN
+* RNN
+* LSTM
+* GRU
+
+
 ## Related papers
 1. [[1608.03983] SGDR: Stochastic Gradient Descent with Warm Restarts](https://arxiv.org/abs/1608.03983)
 2. [[1506.01186] Cyclical Learning Rates for Training Neural Networks](https://arxiv.org/abs/1506.01186)
@@ -45,3 +63,4 @@ sub_model.test_m()
 
 ## Related references
 1. [Another data science student's blog](https://sgugger.github.io/)
+2. [动手学深度学习 文档](https://zh.gluon.ai/toc.html)
