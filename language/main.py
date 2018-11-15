@@ -77,7 +77,7 @@ for epoch in range(num_epochs):
         # Backward and optimize
         model.zero_grad()
         loss.backward()
-        # UserWarning: torch.nn.utils.clip_grad_norm is now deprecated in favor of torch.nn.utils.clip_grad_norm_.
+        # 在更新参数之前裁剪梯度，以防止梯度爆炸或者梯度消失
         clip_grad_norm_(model.parameters(), 0.5)
         optimizer.step()
 

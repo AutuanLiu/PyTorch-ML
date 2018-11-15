@@ -54,6 +54,7 @@ sub_model.test_m()
 * RNN
 * LSTM
 * GRU
+* [Neural Network for Time Series](https://github.com/AutuanLiu/Deep-Learning-for-Time-Series)
 
 
 ## Related papers
@@ -64,3 +65,4 @@ sub_model.test_m()
 ## Related references
 1. [Another data science student's blog](https://sgugger.github.io/)
 2. [动手学深度学习 文档](https://zh.gluon.ai/toc.html)
+3. [Understanding LSTM and its diagrams](https://medium.com/mlreview/understanding-lstm-and-its-diagrams-37e2f46f1714)
