@@ -99,7 +99,7 @@ def log_validation_results(trainer):
         evaluator.run(v)
         metrics = evaluator.state.metrics
         print(
-            f"{k} - Epoch: {trainer.state.epoch}  Avg accuracy: {metrics['accuracy']:.2f} Avg loss: {metrics['loss']:.2f} Time cost: {timer.value()}")
+            f"{k} - Epoch: {trainer.state.epoch}  Avg accuracy: {metrics['accuracy']:.2f} Avg loss: {metrics['loss']:.2f} Time cost: {timer.value():.2f}s")
 
 
 # train
