@@ -14,14 +14,11 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 # 数据集
 train_dataset = torchvision.datasets.FashionMNIST(
     root='datasets/', train=True, transform=transforms.ToTensor(), download=True)
-test_dataset = torchvision.datasets.FashionMNIST(
-    root='datasets/', train=False, transform=transforms.ToTensor())
+test_dataset = torchvision.datasets.FashionMNIST(root='datasets/', train=False, transform=transforms.ToTensor())
 
 # Data loader
-train_loader = torch.utils.data.DataLoader(
-    dataset=train_dataset, batch_size=64, shuffle=True)
-test_loader = torch.utils.data.DataLoader(
-    dataset=test_dataset, batch_size=32, shuffle=False)
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=64, shuffle=True)
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=32, shuffle=False)
 
 
 class LeNet(nn.Module):
@@ -53,12 +50,8 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # trainerand evaluator
 trainer = create_supervised_trainer(model, optimizer, criterion, device=device)
-evaluator = create_supervised_evaluator(model, metrics={
-    'accuracy': Accuracy(),
-    'loss': Loss(criterion)
-}, device=device)
-checkpoint_handler = ModelCheckpoint(
-    'logs/', 'network', save_interval=1, n_saved=1, require_empty=False)
+evaluator = create_supervised_evaluator(model, metrics={'accuracy': Accuracy(), 'loss': Loss(criterion)}, device=device)
+checkpoint_handler = ModelCheckpoint('logs/', 'network', save_interval=1, n_saved=1, require_empty=False)
 
 
 @trainer.on(Events.ITERATION_COMPLETED)
@@ -66,16 +59,15 @@ def log_training_loss(trainer):
     iter = (trainer.state.iteration - 1) % len(train_loader) + 1
     if iter % 100 == 0:
         print(
-            f"Epoch[{trainer.state.epoch}] data trained: {100 * iter/len(train_loader):.2f}% Loss: {trainer.state.output:.2f}")
+            f"Epoch[{trainer.state.epoch}] data trained: {100 * iter/len(train_loader):.2f}% Loss: {trainer.state.output:.2f}"
+        )
 
 
 # adding handlers using `trainer.add_event_handler` method API
-trainer.add_event_handler(event_name=Events.EPOCH_COMPLETED,
-                          handler=checkpoint_handler, to_save={'LeNet': model})
+trainer.add_event_handler(event_name=Events.EPOCH_COMPLETED, handler=checkpoint_handler, to_save={'LeNet': model})
 
 # param scheduler
-scheduler = CosineAnnealingScheduler(
-    optimizer, 'lr', 1e-2, 1e-4, 2*len(train_loader))
+scheduler = CosineAnnealingScheduler(optimizer, 'lr', 1e-2, 1e-4, 2 * len(train_loader))
 trainer.add_event_handler(Events.ITERATION_COMPLETED, scheduler)
 
 # early stopping
@@ -99,8 +91,9 @@ def log_validation_results(trainer):
         evaluator.run(v)
         metrics = evaluator.state.metrics
         print(
-            f"{k} - Epoch: {trainer.state.epoch}  Avg accuracy: {metrics['accuracy']:.2f} Avg loss: {metrics['loss']:.2f} Time cost: {timer.value():.2f}s")
+            f"{k} - Epoch: {trainer.state.epoch}  Avg accuracy: {metrics['accuracy']:.2f} Avg loss: {metrics['loss']:.2f} Time cost: {timer.value():.2f}s"
+        )
 
 
 # train
-trainer.run(train_loader, max_epochs=500)
+trainer.run(train_loader, max_epochs=100)
