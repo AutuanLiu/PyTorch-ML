@@ -113,6 +113,8 @@ torch.save(net.state_dict(), 'CNN/cifarnet.ckpt')
 # checkpoint = torch.load('CNN/cifarnet.ckpt')
 # net.load_state_dict(checkpoint)
 
+torch.save(net, 'net.pth')
+
 # 可视化 loss
 plt.plot(loss_his.numpy())
 plt.xlabel('epoch')
