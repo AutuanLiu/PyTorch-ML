@@ -14,6 +14,11 @@ clr = cyclical_lr(step_size, min_lr=0.001, max_lr=1, scale_func=clr_func, scale_
 scheduler = lr_scheduler.LambdaLR(optimizer, [clr])
 ```
 2. [SGDR(has been committed to PyTorch)](WarmRestart_example.py)
+
+* [Warm restart policy is available now by AutuanLiu · Pull Request #6130 · pytorch/pytorch](https://github.com/pytorch/pytorch/pull/6130)
+* [Cosine Annealing with warm restarts by roveo · Pull Request #7821 · pytorch/pytorch](https://github.com/pytorch/pytorch/pull/7821)
+* [Cosine annealing with restarts by striajan · Pull Request #11104 · pytorch/pytorch](https://github.com/pytorch/pytorch/pull/11104)
+
 ```python
 torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100, eta_min=1e-8, T_mult=2)
 # T_max < training epochs if you want to use restart policy
