@@ -13,30 +13,25 @@ num_epochs = 100
 learning_rate = 0.001
 
 # Image preprocessing modules
-transform = transforms.Compose([
-    transforms.Pad(4),
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomCrop(32),
-    transforms.ToTensor()])
+transform = transforms.Compose(
+    [transforms.Pad(4),
+     transforms.RandomHorizontalFlip(),
+     transforms.RandomCrop(32),
+     transforms.ToTensor()])
 
 # CIFAR-10 dataset
-train_dataset = torchvision.datasets.CIFAR10(
-    root='datasets/', train=True, transform=transform, download=True)
-test_dataset = torchvision.datasets.CIFAR10(
-    root='datasets/', train=False, transform=transforms.ToTensor())
+train_dataset = torchvision.datasets.CIFAR10(root='datasets/', train=True, transform=transform, download=True)
+test_dataset = torchvision.datasets.CIFAR10(root='datasets/', train=False, transform=transforms.ToTensor())
 
 # Data loader
-train_loader = torch.utils.data.DataLoader(
-    dataset=train_dataset, batch_size=100, shuffle=True)
-test_loader = torch.utils.data.DataLoader(
-    dataset=test_dataset, batch_size=100, shuffle=False)
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=100, shuffle=True)
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=100, shuffle=False)
 
 
 class BnLayer(nn.Module):
     def __init__(self, ni, nf, stride=2, kernel_size=3):
         super().__init__()
-        self.conv = nn.Conv2d(ni, nf, kernel_size=kernel_size, stride=stride,
-                              bias=False, padding=1)
+        self.conv = nn.Conv2d(ni, nf, kernel_size=kernel_size, stride=stride, bias=False, padding=1)
         self.a = nn.Parameter(torch.zeros(nf, 1, 1))
         self.m = nn.Parameter(torch.ones(nf, 1, 1))
 
@@ -46,23 +41,21 @@ class BnLayer(nn.Module):
         if self.training:
             self.means = x_chan.mean(1)[:, None, None]
             self.stds = x_chan.std(1)[:, None, None]
-        return (x-self.means) / self.stds * self.m + self.a
+        return (x - self.means) / self.stds * self.m + self.a
 
 
 class ResnetLayer(BnLayer):
-    def forward(self, x): return x + super().forward(x)
+    def forward(self, x):
+        return x + super().forward(x)
 
 
 class Resnet(nn.Module):
     def __init__(self, layers, c):
         super().__init__()
         self.conv1 = nn.Conv2d(3, 10, kernel_size=5, stride=1, padding=2)
-        self.layers1 = nn.ModuleList([BnLayer(layers[i], layers[i+1])
-                                     for i in range(len(layers) - 1)])
-        self.layers2 = nn.ModuleList([ResnetLayer(layers[i+1], layers[i + 1], 1)
-                                      for i in range(len(layers) - 1)])
-        self.layers3 = nn.ModuleList([ResnetLayer(layers[i+1], layers[i + 1], 1)
-                                      for i in range(len(layers) - 1)])
+        self.layers1 = nn.ModuleList([BnLayer(layers[i], layers[i + 1]) for i in range(len(layers) - 1)])
+        self.layers2 = nn.ModuleList([ResnetLayer(layers[i + 1], layers[i + 1], 1) for i in range(len(layers) - 1)])
+        self.layers3 = nn.ModuleList([ResnetLayer(layers[i + 1], layers[i + 1], 1) for i in range(len(layers) - 1)])
         self.out = nn.Linear(layers[-1], c)
 
     def forward(self, x):
@@ -107,12 +100,12 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
 
-        if (i+1) % 100 == 0:
-            print("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
-                  .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+        if (i + 1) % 100 == 0:
+            print("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}".format(epoch + 1, num_epochs, i + 1, total_step,
+                                                                    loss.item()))
 
     # Decay learning rate
-    if (epoch+1) % 20 == 0:
+    if (epoch + 1) % 20 == 0:
         curr_lr /= 3
         update_lr(optimizer, curr_lr)
 
@@ -129,8 +122,7 @@ with torch.no_grad():
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
 
-    print('Accuracy of the model on the test images: {} %'.format(
-        100 * correct / total))
+    print('Accuracy of the model on the test images: {} %'.format(100 * correct / total))
 
 # Save the model checkpoint
 torch.save(model.state_dict(), 'logs/resnet2.ckpt')
